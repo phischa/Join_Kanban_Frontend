@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join | Sign up</title>
+    <link type="text/css" rel="stylesheet" href="../css/main.css">
+    <link type="text/css" rel="stylesheet" href="../css/scrollbar.css">
+    <link type="text/css" rel="stylesheet" href="../css/signUp.css">
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+
+    <script src="../javascript/include.js"></script>
+    <script src="../javascript/database.js"></script>
+    <script src="../javascript/storage.js"></script>
+    <script src="../javascript/signUp.js"></script>
+</head>
+
+<body onload="initSignUp()">
+    <div class="content">
+        <div id="login-header">
+            <div id="login-img">
+                <img id="img-logo" src="../img/logo-join.svg" alt="logo">
+            </div>
+            <div id="sign-up">
+                <span></span>
+            </div>
+        </div>
+        <div class="login-container">
+            <div id="login-box">
+                <div class="login-content">
+                    <a class="lala" href="start.html"><img id="ArrowSign" title="back"
+                            src="../img/icons/arrow-left-line.svg"></a>
+                    <div class="login-headline">
+                        <span>Sign up</span>
+                        <div class="blue-border"></div>
+                    </div>
+                    <form id="form" onsubmit="newUser(); return false;">
+                        <div class="input">
+                            <div class="input-field">
+                                <input type="name" placeholder="Username" id="name" required>
+                                <img src="../img/icons/person.svg">
+                            </div>
+                            <div class="input-info"></div>
+                            <div class="input-field">
+                                <input type="email" placeholder="Email" id="email" required>
+                                <img src="../img/icons/mail.svg">
+                            </div>
+                            <div class="input-info"></div>
+                            <div class="input-field" id="input-field1">
+                                <input onkeydown="changeIconToVisibilityOff1()" type="password" placeholder="Password"
+                                    id="password" required>
+                                <img onclick="changeInputType1()" id="password-icon1" src="../img/icons/lock.svg">
+                            </div>
+                            <div class="input-info"></div>
+                            <div class="input-field" id="input-field2">
+                                <input onkeydown="changeIconToVisibilityOff2()" type="password"
+                                    placeholder="Repeat Password" id="repeat" required>
+                                <img onclick="changeInputType2()" id="password-icon2" src="../img/icons/lock.svg">
+                            </div>
+                        </div>
+                        <span id="wrong-password" class="d-none">Oops! Your password doesn't match.</span>
+                        <div class="checkbox-area">
+                            <label class="checkbox-label" for="checkbox">
+                                <img id="checkbox" src="../img/icons/checkbox-default.svg" alt="">
+                                <input onclick="switchCheckbox()" type="checkbox" id="checkbox-input" required>
+                                I accept the <a href="privacyRestricted.html">Privacy policy</a>
+                            </label>
+                        </div>
+                        <div class="btn-35">
+                            <button id="signup-btn" class="disabled-btn" onclick="newUser()">Sign up</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <a class="footer-links" href="privacyRestricted.html">Privacy Policy</a>
+            <a class="footer-links" href="legalRestricted.html">Legal Notice</a>
+        </footer>
+        <div id="popup" class="popup d-none">
+            <span class="button">You signed Up successfully</span>
+        </div>
+        <div id="popup-fail" class="popup d-none">
+            <span class="button">This email already exists</span>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,656 @@
+@media screen and (min-width: 1920px){
+    .content_wrapper{
+        width: calc(100vw - 688px);
+    }
+    .person-card-centric{
+    margin-left: auto;
+    margin-right: auto;
+    }
+    .button-container-addcontact,.button-container-editcontact{
+        margin-top: 4rem;
+    }
+}
+
+@media (max-width:1920px){
+    .content_wrapper{
+        margin-left: 0;
+    }
+    .button-container-addcontact,.button-container-editcontact{
+        margin-top: 4rem;
+    }
+}
+
+@media screen and (max-width: 1400px){
+    .headline-container{
+        width: 38rem;
+        margin-bottom: 4rem;
+    }
+    .headline-container-vertical,.person-card-headline{
+        flex-direction: column;
+        align-items: baseline;
+    }
+    .person-card-headline{
+        height: 14.563rem;
+        margin: 0;
+    }
+    .line{
+        display: none;
+    }
+    .text-headline{
+        line-height: 3rem;
+    }
+    .line-horizontal{
+        height: 0.125rem;
+        width: 5rem;
+        border: 1px solid #29ABE2;
+        background-color: #29ABE2;
+    }
+    .person-card{
+        margin: 0;
+    }
+    .contact-information{
+        margin-top: 2rem;
+        margin-left: 3.375rem;
+    }
+    .person-card{
+        margin-top: 1.75rem;
+    }
+    .distance-name, .name{
+        margin-top: 1rem;
+    }
+}
+
+@media screen and (max-width: 1350px){
+    .headline-container{
+        width: 28rem;
+    }
+}
+
+@media screen and (max-width: 1300px){
+    .addcontact{
+        margin-left: 40px;
+        margin-right: 40px;
+    }
+}
+
+@media screen and (max-width: 1250px){
+    .addcontact{
+        width:1052px;
+    }
+    .bigpeople-icon{
+        height: 7.188rem;
+        width: 7.188rem;
+        margin-top: 12.75rem;
+        margin-right: 1.5rem;
+        margin-left: 1.5rem;
+    }
+    .left-side{
+        width: 26.188rem;
+        margin: 0;
+    }
+}
+@media screen and (min-width: 1201px){
+    .headline-container-mobile,.person-card-mobile,.mobile-name,.close-white-icon{
+       display: none;
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .button-container,.headline-container,.person-card,.close-white-icon,.name-container{
+        display: none;
+    }
+    .contact-container{
+         width: 100%;
+    }
+    .mobile-button{
+         visibility: visible;
+    }
+    h1{
+         font-size: 2.938rem;
+    }
+    .text-headline{
+        font-size: 1.5rem;
+        margin-left: 1rem;
+    }
+    .arrow-left-icon{
+        margin-right: 1rem;
+    }
+    .person-card-mobile{
+        height: 17.125rem;
+    }
+    .circle{
+        height: 4.625rem;
+        max-width: 4.625rem;
+        border-radius: 3.5rem;
+        margin-right: 1.25rem;
+    }
+    .circle-initial{
+        font-size: 1.688rem;
+        font-weight: 400;
+        line-height: 2.025rem;
+    }
+    .contact-information{
+        margin: 1.313rem 0 0 0;
+    }
+    .mobile-name{
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 2.7rem;
+    }
+    .person-card-headline {
+        flex-direction: row;
+        align-items: center;
+        height: 14.563rem;
+    }
+    .delete-container{
+        margin: 0;
+    }
+    .requiredtext{
+        font-size: 0.95rem;
+        width: 10rem;
+    }
+    .requiredemail{
+        font-size: 0.95rem;
+        width: 11.875rem;
+    }
+}
+@media screen and (max-width: 1100px){
+    .form-dimension{
+        margin-top: 2rem;
+    }
+    .addcontact{
+        height: 33rem;
+        width: 59.375rem;
+    }
+    .left-side{
+        width: 22.188rem;
+        height: 33.125rem;
+    }
+    .bigpeople-icon{
+        height: 7.188rem;
+        width: 7.188rem;
+        margin-top: 12.75rem;
+        margin-right: 1.5rem;
+        margin-left: 1.5rem;
+    }
+    input{
+        width: 22.75rem;
+    }
+    .form-dimension{
+        width: 25.475rem;
+    }
+    .right-side{
+        height: 27.25rem;
+        padding: 3rem 1.5rem 3rem 0;
+    }
+    h5{
+        font-size: 2.938rem;
+        line-height: 3.525rem;
+        font-weight: 700;
+    }
+    h6{
+        font-size: 1.25rem;
+        line-height: 1.5rem;
+    }
+    .dimension-logo{
+        height: 3.5rem;
+        width: 2.8rem;
+        transform: translate(0,-10.25rem);
+    }
+    .button-container-addcontact,.button-container-editcontact{
+        margin-top: 4rem;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    .dimension-logo,.button-cancel-addcontact{
+        display: none;
+    }
+    .rotatecontainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .d_flexdirection_r_sb{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .addcontact{
+        height: 49rem;
+        width: 24.75rem;
+        left: 0;
+        border-radius: 1.875rem;
+        background-color: #FFFFFF;
+    }
+    .left-side{
+        height: 22rem;
+        width: 24.75rem;
+        border-top-left-radius: 1.875rem;
+        border-top-right-radius: 1.875rem;
+        border-bottom-left-radius: 0rem;
+    }
+    .bigpeople-icon{
+        position: fixed;
+        height: 7.125rem;
+        width: 7.125rem;
+        margin: 0;
+        transform: translate(0,-3.75rem);
+    }
+    .right-side{
+        height: 25.5rem;
+        width: 22.75rem; 
+        padding: 0 1rem;
+        border-top-right-radius: 0rem;
+        border-bottom-left-radius: 1.875rem;
+        border-bottom-right-radius: 1.875rem;
+    }
+    input{
+        width: 20.124rem;
+    }
+    .input-icon{
+        padding: 0.519rem 1.313rem; 
+    }
+    .d_flexdirection_r{
+        justify-content: center;
+    }
+    .form-dimension{
+        margin-top: 3.75rem;
+        height: 12.25rem;
+        width: 100%;
+    }
+    form{
+        height: 18rem;
+    }
+    .button-container-addcontact{
+        margin-top: 2rem;
+        width: 100%; 
+    }
+    .button-createcontact{
+        font-size: 1.313rem;
+        line-height: 1.575rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-21rem);
+        filter: invert(97%) sepia(3%) saturate(13%) hue-rotate(93deg) brightness(150%) contrast(108%);
+    }
+    .button-container-editcontact{
+        width: 100%; 
+    }
+    @keyframes openAddContact {
+        0%	{ 
+            transform: translate(0,2500px); 
+        }
+    }
+    @keyframes closeAddContact {
+        100%	{ 
+            transform: translate(0,2500px); 
+        }
+    }
+    .requiredtext{
+        font-size: 0.9rem;
+        width: 9.375rem;
+    }
+    .requiredemail{
+        font-size: 0.9rem;
+        width: 11.25rem;
+    }
+    .text-formation-required{
+        margin: 0.3rem 0 0 0.625rem;
+        height: 1.5rem;
+    }
+    .button-container-editcontact{
+        margin-top: 2.8rem;
+    }
+    .button-container-editcontact{
+        transform: translate(0,-1rem);
+    }
+
+}
+
+@media screen and (max-width: 750px){
+    .person-card-headline{
+        width: 100%;
+    }
+    .mobile-name{
+        word-wrap: break-word;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .distance-end{
+        height: 5.5rem;
+    }
+    .d_flexdirection_r__sb{
+        width: calc(100vw - 1rem);
+    }
+}
+
+@media screen and (max-width: 520px){
+    .delete-window{
+        width: 26.25rem;
+    }
+    p{
+        padding: 0 1rem;
+    }
+}
+
+@media screen and (max-width: 480px){
+    .delete-window{
+        height: 11.625rem;  
+    }
+    p{
+        font-size: 1.25rem;
+    }
+}
+
+@media screen and (max-width: 450px){
+    .delete-window{
+        width: 23.5rem;
+    }
+    p{
+        padding: 0 0.5rem;
+    }
+    .button-yes{
+        width: 10.375rem;
+    }
+    .requiredtext{
+        font-size: 0.9rem;
+    }
+    .requiredemail{
+        font-size: 0.9rem;
+    }
+    .form-dimension{
+        height: 12.25rem;
+    }
+}
+
+@media screen and (max-width: 400px){
+    .addcontact,.left-side{
+        width: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+    .right-side{
+        width: 20.75rem;
+    }
+    input{
+        width: 18.124rem;
+    }
+    .delete-window{
+        width: 20.5rem;
+    }
+    .button-yes{
+        height: 3rem;
+        width: 8.875rem;
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+    .button-cancel{
+        height: 3rem;
+        width: 6.375rem;
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+    p{
+        font-size: 1rem;
+    }
+    .requiredtext{
+        font-size: 0.8rem;
+        width: 8.438rem;
+    }
+    .requiredemail{
+        font-size: 0.8rem;
+        width: 10rem;
+    }
+}
+
+@media screen and (max-width: 380px){
+    .dividing-line{
+        width: 20rem;
+    }
+    .preview-contact-container{
+        width: 17rem;
+    }
+    .contact-container{
+        width: 23.5rem;
+    }
+    .firstletter-container{
+        width: 15.5rem;
+    }
+    .distance-end{
+        height: 5.5rem;
+    }
+    .name-email-container{
+        margin-left: 1.5rem;
+    }
+    .requiredtext{
+        font-size: 0.78rem;
+        width: 8.5rem;
+    }
+    .requiredemail{
+        font-size: 0.78rem;
+        width: 10rem;
+    }
+}
+
+@media screen and (max-width: 375px){
+    .right-side{
+        width: 18.75rem;
+    }
+    input{
+        width: 16.124rem;
+    }
+    h5{
+        font-size: 2rem;
+        line-height: 2.3rem;
+    }
+    h6{
+        font-size: 1rem;
+        line-height: 1.25rem;
+    }
+    .requiredtext{
+        font-size: 0.73rem;
+        width: 7.8rem;
+    }
+    .requiredemail{
+        font-size: 0.73rem;
+        width: 9.5rem;
+    }
+}
+
+@media screen and (max-width: 360px){
+    .preview-contact-container{
+        margin-left: 0.5rem;
+        width: 16rem;
+    }
+    .name-email-container{
+        margin-left: 1.5rem;
+    }
+    .email{
+        font-size: 0.9rem;
+    }
+    .name-email-container{
+        margin-left: 1rem;
+    }
+    .first-last-name{
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 345px){
+    .right-side{
+        width: 16.75rem;
+    }
+    input{
+        width: 14.124rem;
+    }
+    .delete-window{
+        width: 19.5rem;
+        border-radius: 1rem;
+    }
+    .button-yes{
+        width: 7.875rem;
+    }
+    .button-cancel{
+        width: 5.375rem;
+    }
+    .head-delete-window{
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+    }
+    .requiredtext{
+        font-size: 0.66rem;
+        width: 7.7rem;
+    }
+    .requiredemail{
+        font-size: 0.66rem;
+        width: 9.2rem;
+    }
+}
+
+@media screen and (max-width: 340px){
+    .dividing-line{
+        margin-left: 1rem;
+        width: 18rem;
+    }
+    .distance-end{
+        height: 5.5rem;
+    }
+    .preview-contact-container{
+        margin-left: 1rem;
+        width: 15rem;
+    }
+    .name-email-container{
+        margin-left: 1rem;
+    }
+}
+
+@media screen and (max-width: 330px){
+    .delete-window{
+        width: 18.5rem;
+    }
+}
+
+@media screen and (max-width: 320px){
+    .dividing-line{
+        margin-left: 1.5rem;
+        width: 16.5rem;
+    }
+    .firstletter-container{
+        margin-left:  1rem;
+        width: 14rem;
+    }
+    .distance-end{
+        height: 5.5rem;
+    }
+    .preview-contact-container{
+        margin-left: 1.25rem;
+        padding: 0.75rem 1rem;
+        width: 15rem;
+    }
+    .name-email-container{
+        margin-left: 0.5rem;
+    }
+    .delete-window{
+        width: 17.5rem;
+    }
+}
+
+@media screen and (max-height: 785px) and (max-width: 1000px){
+    .addcontact{
+        height: 46rem;
+    }
+    .left-side{
+        height: 19rem;
+    }
+    .right-side{
+        height: 21.5rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-18rem);
+    }
+}
+
+@media screen and (max-height: 750px) and (max-width: 1000px){
+    .addcontact{
+        height: 44.25rem;
+    }
+    .left-side{
+        height: 18rem;
+    }
+    .right-side{
+        height: 21.5rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-17rem);
+    }
+    .form-dimension{
+        margin-top: 3rem;
+    }
+}
+
+@media screen and (max-height: 720px) and (max-width: 1000px){
+    .addcontact{
+        height: 41rem;
+    }
+    .left-side{
+        height: 15rem;
+    }
+    .right-side{
+        height: 20rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-14rem);
+    }
+}
+
+@media screen and (max-height: 670px) and (max-width: 1000px){
+    .addcontact{
+        height: 100svh;
+        max-width: 100%;
+        width: none;
+    }
+    .left-side{
+        height: 14rem;
+    }
+    .right-side{
+        height: 20rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-13rem);
+    }
+    .mobile-name{
+        font-size: 2rem;
+    }
+    .person-card-mobile{
+        margin: 3rem 1rem 0rem 1rem;
+    }
+    h1{
+        font-size: 2.7rem;
+    }
+    .requiredtext{
+        margin: 1.5rem 0 0 0;
+    }
+    .requiredemail{
+        margin: 1.5rem 0 0 0;
+    }
+}
+
+@media screen and (max-height: 650px) and (max-width: 1000px){
+    .addcontact{
+        height: 39rem;
+    }
+    .left-side{
+        height: 13rem;
+    }
+    .right-side{
+        height: 19.5rem;
+    }
+    .d_flex_end{
+        transform: translate(0,-12rem);
+    }
+}

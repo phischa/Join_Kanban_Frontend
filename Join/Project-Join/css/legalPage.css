@@ -1,0 +1,177 @@
+@font-face {
+   font-family: "Inter";
+   src: url("../fonts/Inter-VariableFont_slnt,wght.ttf") format("truetype");
+   font-weight: 100 1000;
+}
+
+body {
+   font-family: "Inter";
+   font-weight: 100 1000;
+   font-size: 16px;
+   height: 100%;
+}
+
+h1 {
+   height: 4.563rem;
+   font-size: 3.813rem;
+   font-weight: 700;
+   color: #000000;
+   gap: 1px;
+   margin: 0;
+}
+
+h2 {
+   height: 2rem;
+   font-size: 1.688rem;
+   font-weight: 700;
+   color: #000000;
+   gap: 1px;
+   margin: 0;
+}
+
+h3 {
+   margin: 0;
+}
+
+#enumeration{
+   padding-inline-start: 20px;
+   margin-block-end: 0px;
+   margin-block-start: 0px;
+}
+
+#enumeration li{
+   padding-left: 16px;
+   margin: 24px 0px;
+}
+
+#enumeration h3{
+   margin-bottom: 4px;
+}
+
+
+#legalContent {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   margin-top: 110px;
+   gap: 24px;
+   width: 90%;
+   max-width: calc(1920px - 156px);
+   margin-left: 116px;
+   margin-right: 40px;
+}
+
+
+
+#contentCenter {
+   min-height: 100%;
+
+}
+
+#ArrowBack {
+   width: 37px;
+   height: 37px;
+   border-radius: 100%;
+}
+
+#ArrowBack:hover {
+   scale: 1.2;
+   background-color: #CDCDCD;
+   transition: all 100ms ease-in-out;
+}
+
+#headerRow {
+   width: 100%;
+   max-width: 1920%;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+a {
+   color: #29ABE2;
+}
+
+.main-container {
+   display: flex;
+   justify-content: center;
+   height: 100%;
+
+}
+
+@media screen and (max-width:860px) {
+   #headerRow {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      flex-direction: column-reverse;
+      height: 100%;
+      text-wrap: nowrap;
+   }
+   #headerRow h1{
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+   }
+
+   #legalContent {
+      max-width: calc(1920px - 80px);
+      margin-left: 40px;
+      margin-right: 40px;
+   }
+}
+
+@media screen and (max-width:700px) {
+   #headerRow h1{
+      font-size: 46px;
+   }
+
+}
+
+
+@media screen and (max-width:600px) {
+   h2 {
+      font-size: 27px;
+   }
+
+   #headerRow {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: row;
+      height: 100%;
+      text-wrap: nowrap;
+
+   }
+   #headerRow h1{
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+   }
+
+   #legalContent {
+      max-width: calc(1920px - 80px);
+      margin-left: 40px;
+      margin-right: 40px;
+   }
+
+}
+
+@media screen and (max-width:460px) {
+   #headerRow {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-end;
+      flex-direction: column-reverse;
+      height: 100%;
+      text-wrap: nowrap;
+   }
+   #headerRow h1{
+      height: 100%;
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      text-wrap: wrap;
+   }
+}

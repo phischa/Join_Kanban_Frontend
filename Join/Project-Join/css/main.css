@@ -1,0 +1,559 @@
+@font-face {
+    font-family: "Inter";
+    src: url("../fonts/Inter-VariableFont_slnt,wght.ttf") format("truetype");
+    font-weight: 100 1000;
+}
+
+:root {
+    --join-blue: #29abe2;
+    --bright_textcolor: #fff;
+    --text_color: #cdcdcd;
+    --dark-background-color: #2a3647;
+    --error: #ff8190;
+}
+
+body,
+html {
+    font-family: "Inter";
+    width: 100%;
+    margin: 0px;
+    background-color: #f6f7f8;
+}
+
+.get-height {
+    height: 100%;
+}
+
+.logoContainer{
+    display: flex;
+    justify-content: center;
+    padding-top: 72px;
+}
+
+.logo {
+   display: flex;
+   width: 101px;
+}
+
+.logo img {
+    width: 100px;
+    height: 121px;
+    object-fit: contain;
+    object-position: center;
+}
+
+.errorIsOn {
+    display: flexbox;
+    color: var(--error);
+    font-size: 14px;
+    padding-left: 8px;
+    height: 16px;
+    margin-top: 4px;
+    margin-top: 8px;
+}
+
+.errorBoarder {
+    border: 1px solid var(--error) !important;
+    border-radius: 10px;
+}
+
+.hideElement {
+    display: none !important;
+}
+
+/* ########################### */
+/* ####### Side Menu ######## */
+/* ########################## */
+
+#navigation {
+    font-weight: 600;
+    height: 100%;
+    font-family: "Inter";
+    font-weight: 400;
+    letter-spacing: 0.05rem;
+    width: 232px;
+    background-color: var(--dark-background-color);
+    list-style: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+}
+
+.buffer {
+    
+}
+
+/* ############################### */
+/* ####### Top Navigtaion ######## */
+/* ############################### */
+
+.navi_sidebar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.navi_sidebar ul {
+    align-items: center;
+    width: 100%;
+    padding-inline-start: 0rem;
+    margin-block-start: 0rem;
+    margin-block-end: 0rem;
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    color: var(--bright-Textcolor);
+}
+
+.navi_sidebar a li img {
+    margin-right: 0.75rem;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    object-position: center;
+    vertical-align: middle;
+}
+
+
+.navi_sidebar li {
+    transition: transform 0.125s ease-in;
+    vertical-align: middle;
+    min-width: 120px;
+    height: 30px;
+    list-style: none;
+}
+
+
+.navi_sidebar a {
+    width: 100%;
+    padding: 1rem;
+    display: inline-flex;
+    padding: 8px 0rem;
+    justify-content: center;
+    height: 30px;
+    list-style: none;
+    color: var(--text_color);
+    text-decoration: none;
+    transition: background-color 0.125s ease-in;
+}
+
+.navi_sidebar a:hover {
+    cursor: pointer;
+    color: var(--bright_textcolor);
+    background-color: #091931;
+}
+
+.hover-scale li {
+    transition: transform 0.125s ease-in;
+}
+
+.hover-scale:hover li {
+    transform: scale(1.02);
+    transition: transform 0.125s ease-in;
+}
+
+.navi_sidebar a:hover img {
+    filter: brightness(900%);
+}
+
+/* ################################## */
+/* ####### Bottom Navigation ######## */
+/* ################################# */
+
+.navi_sidebar_bottom {
+    align-items: end;
+    padding-bottom: 72px;
+}
+
+.navi_sidebar_bottom li {
+    height: 30px;
+    padding-top: 0.25rem;
+}
+
+.navi_sidebar_bottom a:hover {
+    cursor: pointer;
+    color: var(--join-blue);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* ################################## */
+/* ######## Mobil Sidebar ########### */
+/* ################################## */
+
+@media (max-width:600px) {
+
+    .logoContainer{
+        display: none;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .navi_sidebar {
+        width: 100%;
+        padding-top: 8px;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navi_sidebar a {
+        padding: 0px 0px 0px 0px;
+        border-radius: 12px;
+        max-width: 90px;
+        align-items: center;
+        height: 100%;
+        font-size: 17px;
+
+    }
+
+    .navi_sidebar ul {
+        justify-content: space-around;
+        padding: 0px 0%;
+        width: 90%;
+        height: 100%;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    .navi_sidebar li {
+        white-space: nowrap;
+        min-width: 60px;
+        flex-direction: column;
+        font-size: 17px;
+    }
+
+    .hover-scale li {
+        letter-spacing: -1px;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navi_sidebar a li img {
+        margin-right: 0;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 5px;
+        height: 35px;
+        width: 35px;
+        object-position: center;
+    }
+
+    .hover-scale:hover li {
+        transform: scale(1);
+    }
+
+
+    #navigation {
+        align-items: center;
+        z-index: 99;
+        position: fixed;
+        bottom: -2px;
+        left: 0px;
+        right: 0px;
+        width: 100%;
+        top: auto;
+        height: 80px;
+    }
+
+    .main-container {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        width: 100% !important;
+    }
+
+    .navi_sidebar_bottom {
+        display: none;
+    }
+}
+
+@media (max-width:420px) {
+    .navi_sidebar li {
+        letter-spacing: -1px;
+        white-space: nowrap;
+        min-width: 30px;
+        flex-direction: column;
+        font-size: 14px;
+        min-width: 55px;
+        font-size: 13px;
+    }
+
+    .navi_sidebar a li img {
+        height: 30px;
+        width: 30px;
+    }
+
+    .navi_sidebar a {
+        border-radius: 8px;
+    }
+}
+
+/* ################################## */
+/* ############ Header ############# */
+/* ################################## */
+
+.head-logo {
+    margin-left: 40px;
+    display: none;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.head-logo img {
+    width: 40px;
+    height: 40px;
+}
+
+.header-dimension {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    margin-left: 232px;
+    top: 0;
+    height: 96px;
+    min-width: calc(100% - 232px);
+    position: sticky;
+    background-color: white;
+    box-shadow: 0px 4px 4px 0px #0000001A;
+}
+
+.head {
+    width: 100%;
+}
+
+.head-text {
+    margin-left: 7.25rem;
+    line-height: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.rightboxinsideheader {
+    height: 3.5rem;
+    width: 6.5rem;
+    margin-right: 40px;
+}
+
+.help-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+    cursor: pointer;
+}
+
+.help-icon:hover {
+    transition: all 0.3s ease-in-out;
+    transform: scale(1.2);
+}
+
+.box-helpicon {
+    height: 2rem;
+    width: 2rem;
+}
+
+.circle-border {
+    position: relative;
+    height: 3.125rem;
+    width: 3.125rem;
+    border: 0.188rem solid #2A3647;
+    border-radius: 1.8rem;
+    cursor: pointer;
+}
+
+.circle-border:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.initialheader {
+    position: relative;
+    height: 3rem;
+    width: 3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #29ABE2;
+}
+
+@media(max-width:850px) {
+    .head-text {
+        margin-left: 40px;
+    }
+
+}
+
+@media(max-width:600px) {
+
+    .help-icon,
+    .head-text {
+        display: none;
+    }
+
+    .head-logo {
+        display: flex;
+        margin-left: 40px;
+    }
+
+    .header-dimension {
+        margin-left: 0px;
+    }
+
+    .head-text {
+        margin-left: 40px;
+    }
+}
+
+/* ################################## */
+/* ######### headline-menu ########## */
+/* ################################## */
+
+#navbar {
+    z-index: 99;
+    position: absolute;
+    top: -23px;
+    right: -15px;
+}
+
+.navbar-bg {
+    z-index: 100;
+    /* position: fixed; */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+
+.navbar {
+    position: absolute;
+    right: -27px;
+    top: 4.6rem;
+    height: 8.625rem;
+    width: 8.125rem;
+    padding: 0.625rem;
+    border-top-left-radius: 1.25rem;
+    border-bottom-left-radius: 1.25rem;
+    border-bottom-right-radius: 1.25rem;
+    background-color: #2A3647;
+}
+
+button {
+    height: 2.875rem;
+    width: 100%;
+    font-family: "Inter";
+    font-size: 1rem;
+    line-height: 1.2rem;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+    letter-spacing: -0.5px;
+    color: #CDCDCD;
+    background-color: #2A3647;
+    border: 0;
+    text-align: left;
+    text-decoration: none;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1)
+}
+
+/* ################################## */
+/* ######## main-container  ######## */
+/* ################################## */
+
+.main-container {
+    margin-left: 232px;
+    height: calc(100vh - 96px);
+    background-color: #F6F7F8;
+}
+
+.d_flex_column {
+    display: flex;
+    flex-direction: column;
+}
+
+.d_flex_column_c {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.d_flex_column_sb {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.d_flex_c_sb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.d_flex_c {
+    display: flex;
+    align-items: center;
+}
+
+.d_flex_c_c {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.d_flex_sb_c {
+    max-width: 1920px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.d_flexdirection_r {
+    display: flex;
+    flex-direction: row;
+}
+
+.d_flexdirection_r_sb {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.d_flexdirection_r_c {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.d_flexdirection_r_sb_c {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.d-none {
+    display: none;
+}
+
+.d_flex_header {
+    display: flex;
+    justify-content: center;
+}
+
+.d_flex_end {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.d_flexdirection_r_sa_c {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join | Kanban Project Management Tool</title>
+  <link type="text/css" rel="stylesheet" href="../css/main.css">
+  <link type="text/css" rel="stylesheet" href="../css/contactsPage.css">  
+  <link type="text/css" rel="stylesheet" href="../css/contactsPage-responsive.css">
+  <link type="text/css" rel="stylesheet" href="../css/scrollbar.css">
+  <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+  <script src="../javascript/storage.js"></script>
+  <script src="../javascript/database.js"></script>  
+  <script src="../javascript/include.js"></script>
+  <script src="../javascript/templateBoard.js"></script>
+  <script src="../javascript/contactsPageOne.js"></script>
+  <script src="../javascript/contactsPageTwo.js"></script>
+  <script src="../javascript/contactsPageThree.js"></script>
+</head>
+
+<body onload="includeHTML(), onload()">
+
+  <div class="position-header">
+    <div w3-include-html="../template/sidebar.html">
+    </div>
+      <div class="d_flex_column">
+        <header class="header-dimension" w3-include-html="../template/header.html">
+        </header>
+          <div class="main-container" onclick="closeNavbar()">
+            <div class="overlay-bg d-none d_flex_c_c" id="success-created">
+              <div class="sucessful d_flex_c_c" id="text-successfulcreated">Contact successfully created
+              </div>
+            </div>
+            <div class="overlay-bg-delete d-none d_flex_c_c" id="delete">
+              <div class="delete-window d_flex_column_c">
+                <div class="head-delete-window d_flex_c"><p>Are you sure you want to delete this contact permanently?</p>
+                </div>
+                <div class="body-delete-window d_flexdirection_r_sa_c">
+                    <button class="button-cancel d_flex_c_c" onclick="closeDeleteContact()">Cancel
+                      <img class="dimension-close-icon" src="../img/icons/close.svg">
+                      </img>
+                    </button>
+                    <button class="button-yes d_flex_c_c" id="yes-button" onclick="finallyDeleted()">Yes
+                      <img class="dimension-check-icon" src="../img/icons/check-icon-addtask.svg">
+                      </img>
+                    </button>
+                </div>
+              </div>
+            </div>
+            <div class="content_wrapper">
+              <div class="d_flexdirection_r">
+                <div class="contact-container" id="width-contact-container">
+                  <div class="d_flex_column_c">
+                    <div class="button-container">
+                      <button class="newcontact" onclick="openAddContact()">Add new contact
+                        <img class="people-icon" src="../img/icons/person-add-icon.svg">
+                        </img>
+                      </button>
+                    </div>
+                    <div id="contact-list">
+                    </div>
+                    <div class="distance-end">
+                    </div>
+                  </div>
+                </div>
+                <div class="person-card-centric">
+                  <div class="d_flex_column">
+                    <div class="d_flexdirection_r headline-container headline-container-vertical">
+                      <div><h1>Contacts</h1>
+                      </div>
+                    <div class="line">
+                    </div>
+                    <div class="text-headline">Better with a team
+                    </div>
+                    <div class="line-horizontal">
+                    </div>
+                    </div>
+                      <div class="person-card d_flex_column_sb" id="person-card">
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+                <div class="mobile-contact-view d-none" id="mobile-contact-view">
+                  <div class="d_flexdirection_r headline-container-mobile headline-container-vertical">                   
+                      <div class="d_flexdirection_r__sb">
+                        <h1>Contacts</h1>
+                        <img class="arrow-left-icon" onclick="backToContactList()" src="../img/icons/arrow-left-line.svg"></img>         
+                      </div>
+                    <div class="line">
+                    </div>
+                    <div class="text-headline">Better with a team
+                    </div>
+                    <div class="line-horizontal">
+                    </div>
+                  </div>
+                  <div class="person-card-mobile d_flex_column_sb" id="person-card-mobile">
+                  </div>
+                  <div class="mobile-button d_flex_c_c" id="mobile-option" onclick="openMobileEditDeleteContainer()">
+                    <img class="mobile-button-icon" src="../img/icons/more_vert.svg"></img>
+                  </div>
+                  <div class="mobile-button d_flex_c_c" id="mobile-addcontact" onclick="openAddContact()">
+                    <img class="mobile-button-icon" src="../img/icons/person-add-icon.svg"></img>
+                  </div>
+                  <div class="mobile-bg d-none d_flex_c_c" id="edit-delete-back" onclick="editDeleteBack()"> 
+                    <div class="mobile-edit-delete-container animation-close-edit-delete-window" id="mobile-edit-delete-c">
+                      <div class="position-edit-delete-container">
+                        <div class="ed-de-container">
+                          <div class="edit-container d_flexdirection_r" onclick="openEditContact(editIndex)">
+                            <img class="edit-icon" src="../img/icons/edit-contact-icon.svg">
+                            </img>
+                            <div class="edit">Edit
+                            </div>
+                          </div>
+                        </div>
+                        <div class="ed-de-container">
+                          <div class="delete-container d_flexdirection_r" style="margin: 0" onclick="deleteContactOfContactPage()">
+                            <img class="delete-icon" src="../img/icons/delete-contact-icon.svg">
+                            </img>
+                            <div class="edit">Delete
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="overlay-bg d-none d_flex_c_c" id="add-contact-bg" onclick="closeAddContact()">
+            <div class="addcontact animationopenaddcontact" id="add-contact" onclick="event.stopPropagation()">
+              <div class="rotatecontainer">
+                <div class="left-side d_flex_c_c">
+                  <div class="side-text">
+                    <h5 id="text-contact">Add contact</h5>
+                    <h6 id="text-taskarebetter">Tasks are better with a team!</h6>
+                    <div class="horizontal-line"></div>
+                    <img class="dimension-logo" id="join-logo" src="../img/logo_small.svg"> 
+                    </img>
+                  </div>
+                </div>
+                <div class="d_flexdirection_r">
+                  <div class="bigpeople-icon d_flex_c_c" id="color-icon">
+                    <img class="smallpeople-icon" id="initial-person-card" src="../img/icons/person_big.svg">
+                    </img>
+                    <div class="circle-initial" id="text-initial"></div>
+                  </div>
+                <div class="right-side" id="right-side">
+                  <div class="d_flex_column">
+                    <div class="d_flex_end">
+                      <img class="close-icon" onclick="closeAddContact()" src="../img/icons/close.svg">
+                      </img>
+                    </div>
+                  </div>
+                    <form autocomplete="off" onsubmit="return false;">
+                      <div class="form-dimension d_flex_column_sb" id="height-form-dimention">
+                        <input id="ltitlename" type="text" lang="en" class="input-icon input-image-person" name="ltitlename" placeholder="Surname Name" pattern="^[A-ZäÄöÖüÜ][a-zäÄöÖüÜ]+\s[A-ZäÄöÖüÜ][a-zäÄöÖüÜ]{2,20}" required />
+                        <div id="required-name" class="text-formation-required"></div>
+                        <input id="ltitleemail" type="email" pattern="^[a-z0-9]+@[^ ]+\.[a-z]{2,6}$" lang="en" class="input-icon input-image-email" name="ltitleemail" placeholder="Email" required />
+                        <div id="required-email" class="text-formation-required"></div>
+                        <input id="ltitlephone" type="text" lang="en" class="input-icon input-image-call" name="ltitlephone" placeholder="Phone (9 - 15 Digits)" pattern="[0-9]{9,15}" required />
+                        <div id="required-phone" class="text-formation-required"></div>
+                      </div>
+                      <div class="button-container-addcontact d-none" id="container-addcontact">
+                        <div class="d_flexdirection_r_sb">
+                          <button class="button-cancel-addcontact d_flex_c_c" onclick="closeAddContact()">Cancel
+                            <img class="dimension-close-icon" src="../img/icons/close.svg">
+                            </img>
+                          </button>
+                          <button type="submit" disabled class="button-createcontact d_flex_c_c" id="button-createcontact">Create contact
+                            <img class="dimension-check-icon" src="../img/icons/check-icon-addtask.svg">
+                            </img>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="button-container-editcontact d-none" id="container-editcontact">
+                        <div class="d_flexdirection_r_sb">
+                          <button class="button-delete d_flex_c_c" onclick="deleteContactFromEditPage()">Delete
+                          </button>
+                          <button class="button-save d_flex_c_c" id="button-save" onclick="saveEditContact(editIndex)">Save
+                            <img class="dimension-check-icon" src="../img/icons/check-icon-addtask.svg">
+                            </img>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="container-message">
+                        <div class="requiredtext" id="requiredtext">
+                          <span class="letter-star">*</span>
+                          This field is required
+                        </div>
+                        <div class="requiredemail d-none" id="requiredemail">
+                          <span class="letter-star">*</span>
+                          This email already exists
+                        </div>
+                      </div> 
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+
+</body>
+</html>

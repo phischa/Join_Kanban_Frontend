@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join | Kanban Project Management Tool</title>
+  <link type="text/css" rel="stylesheet" href="../css/main.css">
+  <link type="text/css" rel="stylesheet" href="../css/board.css">
+  <link type="text/css" rel="stylesheet" href="../css/lightbox.css">
+  <link type="text/css" rel="stylesheet" href="../css/scrollbar.css">
+  <link type="text/css" rel="stylesheet" href="../css/selectInput.css">
+  <link type="text/css" rel="stylesheet" href="../css/board-addTaskPage.css">
+
+  <script src="../javascript/database.js"></script>
+  <script src="../javascript/storage.js"></script>
+
+
+  <script src="../javascript/drag-and-drop.js"></script>
+  <script src="../javascript/templateBoard.js"></script>
+  <script src="../javascript/selectbox.js"></script>
+  <script src="../javascript/editTask.js"></script>
+  <script src="../javascript/include.js"></script>
+  <script src="../javascript/board.js"></script>
+  <script src="../javascript/boardMenuMobil.js"></script>
+  <script src="../javascript/board-lightbox.js"></script>
+  <script src="../javascript/lightbox.js"></script>
+  <script src="../javascript/board-addTaskPage.js"></script>
+  <script src="../javascript/templateAdTaskLightbox.js"></script>
+
+
+  <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+  </head>
+
+<body onload="includeHTML(), initBoard()">
+
+    <div class="position-header">
+    <div w3-include-html="../template/sidebar.html">
+    </div>
+    </div>
+    <header class="header-dimension" w3-include-html="../template/header.html">
+    </header>
+
+    <!--#####################################################
+        ##########            LightBox            ########### 
+        #####################################################-->
+
+    <div onclick="hideBlackbox()" id="blackbox" class="blackbox disable">
+      <div class="blackbox_wrapper">
+        <div onclick="ignorclick(event)"  id="lightbox" class="lightbox slide-in-right">
+          <div id="cardLightboxContent">
+                <!--#####################################################
+                    ##########         LightBox Content       ########### 
+                    #####################################################-->         
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--#####################################################
+        ##########          Main Content          ########### 
+        #####################################################-->
+    
+        <section can-Blur class="main-container" onclick="closeNavbar()">
+          <div class="content_wrapper">
+            
+            <div class="head_area">
+                <h1>Board</h1>
+                <div class="head-merge">
+                  <div class="searchbar_wrapper">
+                  <div class="searchbar"><input id="search" onkeyup="initSearch(false)" placeholder="Find Task"><div class="middle_border"><img onclick="initSearch(true)" src="../img/icons/search.svg"></div></div>
+                </div>
+                <div class="add-task-button" onclick="showBlackBox(), openAddTask(0)"><span>Add task</span><img src="../img/icons/add.svg"></div>
+              </div>
+            </div>
+            <div class="task_wrapper frow">
+
+          <!-- #####################################################
+              ##########           To Do Column          ########### 
+               #####################################################-->
+              <div class="column">
+                <div class="column-wrapper">
+
+                  <div class="named-column frow fs-between">
+                    <h4>To do</h4><div onclick="showBlackBox(), openAddTask(0)"><img class="blue_hover" src="../img/icons/plus button.svg"></div>
+                  </div>
+
+                  <div is-Column id="to-do-content">
+                  </div>
+
+                </div>
+              </div>
+
+          <!--#####################################################
+              ##########       In Progress Column      ########### 
+              ####################################################-->
+
+              <div class="column">
+                <div class="column-wrapper">
+    
+                  <div class="named-column frow fs-between">
+                  <h4>In progress</h4><div onclick="showBlackBox(), openAddTask(1)"><img class="blue_hover" src="../img/icons/plus button.svg"></div>
+                  </div>
+    
+                  <div is-Column id="progress-content">
+                  </div>
+
+                </div>
+              </div>
+
+          <!--#####################################################
+              ##########       In Feedback Column      ########### 
+              ####################################################-->
+
+              <div class="column"> 
+                <div class="column-wrapper">
+
+                  <div class="named-column frow fs-between">
+                    <h4>Await feedback</h4><div onclick="showBlackBox(), openAddTask(2)"><img class="blue_hover" src="../img/icons/plus button.svg"></div>
+                  </div>
+
+                  <div is-Column id="feedback-content">
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- #####################################################
+                   ##########         Is Done Column        ########### 
+                   ####################################################-->
+                   <div class="column">
+                    <div class="column-wrapper">
+    
+                      <div class="named-column frow fs-between">
+                        <h4>Done</h4>
+                      </div>
+
+                      <div is-Column id="is-done-content">
+                      </div>
+
+                    </div>
+                  </div>
+              </div>
+
+               <!--####################################################
+                   ##########             Footer            ###########
+                   ####################################################-->
+                   <div class="boardBuffer"></div>
+
+            </div>
+            
+        </section>
+
+        <script src="../javascript/addTaskPage.js"></script>
+        <script src="../javascript/addTaskPageCategory.js"></script>
+        <script src="../javascript/addTaskPageContactsOne.js"></script>
+        <script src="../javascript/addTaskPageContactsTwo.js"></script>
+        <script src="../javascript/addTaskPageSubtask.js"></script>
+
+</body>
+</html>

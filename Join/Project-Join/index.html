@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join | Kanban Project Management Tool</title>
+  <link type="text/css" rel="stylesheet" href="./css/scrollbar.css">
+  <link type="text/css" rel="stylesheet" href="./css/main.css">
+  <link rel="icon" href="./img/favicon.ico" type="image/x-icon">
+  <script src="./javascript/include.js"></script>
+  <script>
+    function goToStart(){
+      window.location.href ="./pages/start.html";
+    }
+  </script>
+  </head>
+
+  <body onload="includeHTML(), goToStart()">
+    <div class="d_flexdirection_r">
+      <div w3-include-html="./template/sidebar.html"></div>
+      <header class="header-dimension" w3-include-html="./template/header.html">
+      </header>
+    </div>
+
+
+</body>
+</html>

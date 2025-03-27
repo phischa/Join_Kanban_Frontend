@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join | Kanban Project Management Tool</title>
+  <link type="text/css" rel="stylesheet" href="../css/main.css">
+  <link type="text/css" rel="stylesheet" href="../css/summary.css">
+  <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+  <link type="text/css" rel="stylesheet" href="../css/scrollbar.css">
+  <script src="../javascript/include.js"></script>
+  <script src="../javascript/storage.js"></script>
+  <script src="../javascript/database.js"></script>
+  <script src="../javascript/summary.js"></script>
+  <script src="../javascript/summaryBlink.js"></script>
+</head>
+
+<body onload="includeHTML(), onload()">
+  <div class="position-header">
+    <div w3-include-html="../template/sidebar.html"></div>
+    <header class="header-dimension" w3-include-html="../template/header.html"></header>
+    <div class="d_flex_column" onclick="closeNavbar()">
+      <section class="main-container">
+        <div class="headline-container d_flexdirection_r d_flex_c_c">
+          <div class="d_flex_c_c">
+            <h1>JOIN 360</h1>
+          </div>
+          <div class="line" id="lineInHeadLine"></div>
+          <div class="text-headline">Key Metrics at a Glance</div>
+        </div>
+        <div class="d_flexdirection_r">
+          <div class="main-content">
+            <div class="d_fd_column_sb">
+              <div class="d_flexdirection_r_sb">
+                <div class="above-content-todo">
+                  <div class="d_flex_c_c" onclick="goToBoardUsual('to-do-content')">
+                    <div class="d_flexdirection_c_r">
+                      <div class=" d_flex_c_c circle">
+                        <img class="edit-icon" src="../img/icons/edit.svg"></img>
+                      </div>
+                      <div class="d_fd_column_c">
+                        <div class="number-content" id="number-to-do"></div>
+                        <div class="name-box">To-do</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="above-content-done" onclick="goToBoardUsual('is-done-content')">
+                  <div class="d_flex_c_c">
+                    <div class="d_flexdirection_c_r">
+                      <div class="circle d_flex_c_c">
+                        <img class="edit-icon" src="../img/icons/check.svg"></img>
+                      </div>
+                      <div class="d_fd_column_c">
+                        <div class="number-content" id="number-done"></div>
+                        <div class="name-box">Done</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="prio-content d_flexdirection_c_r" id="prioContent" onclick="goToBoard()">
+                <div class="prio-circle d_flex_c_c">
+                  <img class="urgent-icon" src="../img/icons/arrows-urgent.svg"></img>
+                </div>
+                <div class="d_fd_column_c">
+                  <div class="number-content" id="number-urgent"></div>
+                  <div class="text-prio-content">Urgent</div>
+                </div>
+                <div class="prio-line"></div>
+                <div class="container-dateofdeadline" id="containerDeadLine">
+                  <div class="dateofdeadline" id="deadlineDate"></div>
+                  <div class="text-prio-content">Upcoming Deadline</div>
+                </div>
+              </div>
+              <div class="d_flexdirection_r_sb">
+                <div class="down-content-tasksinboard d_fd_column_c" onclick="goToBoardUsual('to-do-content')">
+                  <div class="number-content" id="numberTasksinboard"></div>
+                  <div class="text-down-content">Tasks in Board</div>
+                </div>
+                <div class="down-content-tasksinprogress d_fd_column_c" onclick="goToBoardUsual('progress-content')">
+                  <div class="number-content" id="number-tasksinprogress"></div>
+                  <div class="text-down-content">Tasks in Progress</div>
+                </div>
+                <div class="down-content-awaitingfeedback d_fd_column_c" onclick="goToBoardUsual('feedback-content')">
+                  <div class="number-content" id="number-awaitingfeedback"></div>
+                  <div class="text-down-content">Awaiting Feedback</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="greeting-container">
+            <div class="greeting d_flex_ai_c" id="greetingname"></div>
+            <div class="username-container d_flex_ai_c" id="username"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div id="modalMobileGreeting" class="">
+    <div id="modalContentMobileGreeting">
+      <div class="greeting d_flex_ai_c" id="greetingname2"></div>
+      <div class="username-container d_flex_ai_c" id="username2"></div>
+    </div>
+
+</body>
+
+</html>
