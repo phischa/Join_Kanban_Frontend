@@ -16,7 +16,7 @@ function newUser() {
   let password = document.getElementById('password').value;
   let repeated_password = document.getElementById('repeat').value;
   unsuccessfulTextAway();
-  unsuccessfulTextRemove()
+  unsuccessfulTextRemove();
   passwordConfirm(email, username, password, repeated_password);
 }
 
@@ -39,6 +39,24 @@ async function passwordConfirm(email, username, password, repeated_password) {
 }
 
 /**
+ * Erstellt die Payload für die Registrierungsanfrage
+ * 
+ * @param {string} email - E-Mail des neuen Nutzers
+ * @param {string} username - Benutzername 
+ * @param {string} password - Passwort
+ * @param {string} repeated_password - Passwortbestätigung
+ * @returns {Object} Registrierungsdaten als JSON
+ */
+function createRegistrationPayload(email, username, password, repeated_password) {
+  return {
+    username: username,
+    email: email,
+    password: password,
+    repeated_password: repeated_password
+  };
+}
+
+/**
  * Sendet Registrierungsdaten an das Django-Backend
  * 
  * @param {string} email - E-Mail des neuen Nutzers
@@ -49,23 +67,29 @@ async function passwordConfirm(email, username, password, repeated_password) {
  */
 async function sendRegistrationToBackend(email, username, password, repeated_password) {
   try {
+    const payload = createRegistrationPayload(email, username, password, repeated_password);
     const response = await fetch('http://127.0.0.1:8000/api/auth/registration/', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password,
-        repeated_password: repeated_password
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
     
-    return await response.json();
+    const data = await response.json();
+    console.log('Backend-Antwort:', data);
+    
+    // Erfolgs-Status hinzufügen, falls er vom Backend nicht gesetzt wurde
+    if (!data.status) {
+      data.status = response.ok ? 'success' : 'error';
+    }
+    
+    return data;
   } catch (error) {
     console.error('Registrierungsanfrage fehlgeschlagen:', error);
-    return { status: 'error', message: error.message };
+    return { 
+      status: 'error', 
+      message: 'Verbindungsfehler zum Server',
+      errors: { general: 'Verbindungsfehler zum Server' }
+    };
   }
 }
 
@@ -75,6 +99,8 @@ async function sendRegistrationToBackend(email, username, password, repeated_pas
  * @param {Object} data - Antwort vom Server
  */
 function handleRegistrationResponse(data) {
+  console.log('Verarbeite Registrierungsantwort:', data);
+  
   if (data.status === 'success') {
     handleSuccessfulRegistration(data);
   } else {
@@ -115,25 +141,28 @@ function storeUserData(data) {
 function handleRegistrationError(data) {
   console.error('Registrierungsfehler:', data.errors || data.message);
   
+  // Spezifische Fehlermeldung im Pop-up anzeigen
+  const errorSpan = document.querySelector('#popup-fail .button');
+  
   if (data.errors && data.errors.email) {
-    showEmailExistsError();
+    errorSpan.textContent = data.errors.email;
+    showCustomError();
+  } else if (data.errors && data.errors.username) {
+    errorSpan.textContent = data.errors.username;
+    showCustomError();
+  } else if (data.errors && data.errors.password) {
+    errorSpan.textContent = data.errors.password;
+    showCustomError();
   } else {
-    showGeneralError();
+    errorSpan.textContent = 'Fehler bei der Registrierung';
+    showCustomError();
   }
 }
 
 /**
- * Zeigt Fehlermeldung für bereits existierende E-Mail
+ * Zeigt eine benutzerdefinierte Fehlermeldung an
  */
-function showEmailExistsError() {
-  unsuccessfulText();
-  setTimeout(unsuccessfulTextDown, 3500);
-}
-
-/**
- * Zeigt allgemeine Fehlermeldung
- */
-function showGeneralError() {
+function showCustomError() {
   unsuccessfulText();
   setTimeout(unsuccessfulTextDown, 3500);
 }
@@ -147,176 +176,125 @@ function showPasswordMismatchError() {
 }
 
 /**
- * Überprüft ob die E-Mail bereits existiert und führt entsprechende Aktionen aus
- * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} password - Passwort 
- * @param {string} username - Benutzername
+ * This function gets the user to the login side. A Timeout start thsi function after 2,5 seconds.
  */
-function checkUsers(email, password, username) {
-  checkEmailExistence(email, password, username);
+function forwardToLoginSide() {
+  window.location.href = 'start.html';
 }
 
 /**
- * Prüft, ob die E-Mail bereits lokal existiert bevor der API-Call erfolgt
- * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} password - Passwort
- * @param {string} username - Benutzername
+ * This function show a message, that indicates the successful signin. 
  */
-function checkEmailExistence(email, password, username) {
-  let checkInput = false;
+function successfulText() {
+  document.getElementById('popup').classList.remove('d-none');
+}
 
-  for (let i = 0; i < users.length; i++) {
-    if (email === users[i].email) {
-      checkInput = true;
-      showEmailExistsError();
-      break;
-    }
-  }
-  
-  if (!checkInput) {
-    createUserAndUpdateUI(email, password, username);
+function unsuccessfulText() {
+  document.getElementById('popup-fail').classList.remove('d-none');
+}
+
+function unsuccessfulTextAway() {
+  document.getElementById('popup-fail').classList.add('d-none');
+}
+
+function unsuccessfulTextRemove() {
+  document.getElementById('popup-fail').classList.remove('popup-fail');
+}
+
+function unsuccessfulTextDown() {
+  document.getElementById('popup-fail').classList.add('popup-fail');
+}
+
+/**
+ * This function gets the element by id and adds a class to color the border red.
+ */
+function addBorderColorRed() {
+  document.getElementById('input-field2').classList.add('border-red');
+}
+
+/**
+ * This function gets the element by id and adds a class to show the wrong password text. 
+ */
+function wrongPasswordText() {
+  document.getElementById('wrong-password').classList.remove('d-none');
+}
+
+/**
+ * This function changes the custom icon of the checkbox based on clicking.
+ */
+function switchCheckbox() {
+  let check = document.getElementById('checkbox');
+  if (check.src.includes('checkbox-default.svg')) {
+    check.src = '../img/icons/checkbox-checked.svg';
+  } else {
+    check.src = '../img/icons/checkbox-default.svg';
   }
 }
 
 /**
- * Erstellt einen Benutzer und aktualisiert die UI entsprechend
- * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} password - Passwort
- * @param {string} username - Benutzername
+ * This function changes the type of the password input form password to text. Thus the user can see the typed password.
  */
-function createUserAndUpdateUI(email, password, username) {
-  createUser(email, password, username);
-  successfulText();
+function changeInputType1() {
+  let icon = document.getElementById('password-icon1');
+  if (icon.src.includes('visibility_off.svg')) {
+    icon.src = '../img/icons/visibility_on.svg';
+    let password = document.getElementById('password').type = 'text';
+    addBorderColorBlue(password);
+  } else {
+    icon.src = '../img/icons/visibility_off.svg';
+    document.getElementById('password').type = 'password';
+    removeBorderColorBlue(password);
+  }
 }
 
-  /**
-   * This function gets the user to the login side. A Timeout start thsi function after 2,5 seconds.
-   * 
-   */
-  function forwardToLoginSide() {
-    window.location.href = 'start.html';
+/**
+ * This function changes the type of the password input form password to text. Thus the user can see the typed password.
+ */
+function changeInputType2() {
+  let icon = document.getElementById('password-icon2');
+  if (icon.src.includes('visibility_off.svg')) {
+    icon.src = '../img/icons/visibility_on.svg';
+    let repeat = document.getElementById('repeat').type = 'text';
+    addBorderColorBlue(repeat);
+  } else {
+    icon.src = '../img/icons/visibility_off.svg';
+    document.getElementById('repeat').type = 'password';
+    removeBorderColorBlue(repeat);
   }
+}
 
-  /**
-   * This function show a message, that indicates the successful signin. 
-   */
-  function successfulText() {
-    document.getElementById('popup').classList.remove('d-none');
-  }
+/**
+ * This function adds a blue border to the input fields of password or confirm password
+ * 
+ * @param {string} password 
+ * @param {string} repeated_password
+ */
+function addBorderColorBlue(password, repeated_password) {
+  password = document.getElementById('input-field1').classList.add('border-blue');
+  repeated_password = document.getElementById('input-field2').classList.add('border-blue');
+}
 
-  function unsuccessfulText() {
-    document.getElementById('popup-fail').classList.remove('d-none');
-  }
+/**
+ * This function adds a blue border to the input fields of password or confirm password
+ * 
+ * @param {string} password 
+ * @param {string} repeated_password
+ */
+function removeBorderColorBlue(password, repeated_password) {
+  password = document.getElementById('input-field1').classList.remove('border-blue');
+  repeated_password = document.getElementById('input-field2').classList.remove('border-blue');
+}
 
-  function unsuccessfulTextAway() {
-    document.getElementById('popup-fail').classList.add('d-none');
-  }
+/**
+ * This function changes the icon of the password input when the user starts typing.
+ */
+function changeIconToVisibilityOff1() {
+  document.getElementById('password-icon1').src = '../img/icons/visibility_off.svg';
+}
 
-  function unsuccessfulTextRemove() {
-    document.getElementById('popup-fail').classList.remove('popup-fail');
-  }
-
-  function unsuccessfulTextDown() {
-    document.getElementById('popup-fail').classList.add('popup-fail');
-  }
-
-  /**
-   * This function gets the element by id and adds a class to color the border red.
-   */
-  function addBorderColorRed() {
-    document.getElementById('input-field2').classList.add('border-red');
-  }
-
-  /**
-   * This function gets the element by id and adds a class to show the wrong password text. 
-   */
-  function wrongPasswordText() {
-    document.getElementById('wrong-password').classList.remove('d-none');
-  }
-
-  /**
-   * This function changes the custom icon of the checkbox based on clicking.
-   */
-  function switchCheckbox() {
-    let check = document.getElementById('checkbox');
-    if (check.src.includes('checkbox-default.svg')) {
-      check.src = '../img/icons/checkbox-checked.svg';
-    } else {
-      check.src = '../img/icons/checkbox-default.svg';
-    }
-  }
-
-  /**
-   * This function changes the type of the password input form password to text. Thus the user can see the typed password.
-   *  
-   */
-  function changeInputType1() {
-    let icon = document.getElementById('password-icon1');
-    if (icon.src.includes('visibility_off.svg')) {
-      icon.src = '../img/icons/visibility_on.svg';
-      let password = document.getElementById('password').type = 'text';
-      addBorderColorBlue(password);
-    } else {
-      icon.src = '../img/icons/visibility_off.svg';
-      document.getElementById('password').type = 'password';
-      removeBorderColorBlue(password);
-    }
-  }
-
-  /**
-   * This function changes the type of the password input form password to text. Thus the user can see the typed password.
-   *  
-   */
-  function changeInputType2() {
-    let icon = document.getElementById('password-icon2');
-    if (icon.src.includes('visibility_off.svg')) {
-      icon.src = '../img/icons/visibility_on.svg';
-      let repeat = document.getElementById('repeat').type = 'text';
-      addBorderColorBlue(repeat);
-    } else {
-      icon.src = '../img/icons/visibility_off.svg';
-      document.getElementById('repeat').type = 'password';
-      removeBorderColorBlue(repeat);
-    }
-  }
-
-  /**
-   * This function adds a blue border to the input fields of password or confirm password
-   * 
-   * @param {string} password 
-   * @param {string} repeated_password
-   */
-  function addBorderColorBlue(password, repeated_password) {
-    password = document.getElementById('input-field1').classList.add('border-blue');
-    repeated_password = document.getElementById('input-field2').classList.add('border-blue');
-  }
-
-  /**
-   * This function adds a blue border to the input fields of password or confirm password
-   * 
-   * @param {string} password 
-   * @param {string} repeated_password
-   */
-  function removeBorderColorBlue(password, repeated_password) {
-    password = document.getElementById('input-field1').classList.remove('border-blue');
-    repeated_password = document.getElementById('input-field2').classList.remove('border-blue');
-  }
-
-  /**
-   * This function changes the icon of the password input when the user starts typing.
-   * 
-   */
-  function changeIconToVisibilityOff1() {
-    document.getElementById('password-icon1').src = '../img/icons/visibility_off.svg';
-  }
-
-  /**
-   * This function changes the icon of the confirm input when the user starts typing.
-   * 
-   */
-  function changeIconToVisibilityOff2() {
-    document.getElementById('password-icon2').src = '../img/icons/visibility_off.svg';
-  }
+/**
+ * This function changes the icon of the confirm input when the user starts typing.
+ */
+function changeIconToVisibilityOff2() {
+  document.getElementById('password-icon2').src = '../img/icons/visibility_off.svg';
+}

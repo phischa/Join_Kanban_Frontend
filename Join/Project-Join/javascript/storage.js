@@ -204,7 +204,6 @@ async function deleteContactItem(contactId) {
     return await deleteResource('contacts', contactId);
 }
 
-// User-specific API functions
 /**
  * Loads all users from the API
  * @returns {Promise<Array>} - Array of user objects
