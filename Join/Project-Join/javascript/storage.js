@@ -4,7 +4,7 @@
  */
 
 // API Base URL Configuration
-const API_BASE_URL = "http://127.0.0.1:8000/api/";
+const API_BASE_URL = "http://127.0.0.1:8000/";
 
 /**
  * Constructs a full API endpoint URL
@@ -16,19 +16,58 @@ function getApiUrl(endpoint) {
 }
 
 /**
+ * Gets the authentication headers for API requests
+ * @returns {Object} - Headers object with authentication
+ */
+function getAuthHeaders() {
+    const token = localStorage.getItem('authToken');
+    const headers = { 'Content-Type': 'application/json' };
+
+    if (token) {
+        headers['Authorization'] = `Token ${token}`;
+    }
+
+    return headers;
+}
+
+/**
+ * Überprüft, ob der Gast-Modus aktiv ist
+ * @returns {boolean} True wenn im Gast-Modus
+ */
+function isGuestMode() {
+    return localStorage.getItem('guestMode') === 'true';
+}
+
+/**
  * Fetches data from a specific API endpoint
  * @param {string} endpoint - API endpoint (e.g., 'tasks', 'contacts')
  * @returns {Promise<Array>} - Array of objects from the API
  */
 async function fetchFromApi(endpoint) {
+    // Im Gast-Modus leere Arrays zurückgeben statt API-Aufrufe
+    if (isGuestMode()) {
+        console.log(`Guest mode: Skipping API fetch for ${endpoint}`);
+        return [];
+    }
+
     try {
-        const response = await fetch(getApiUrl(endpoint));
-        
+        console.log(`Fetching data from ${endpoint}...`);
+        const response = await fetch(getApiUrl(endpoint), {
+            headers: getAuthHeaders()
+        });
+
         if (!response.ok) {
+            if (response.status === 401) {
+                // Unauthorized - token might be expired
+                console.error('Authentication error. Please log in again.');
+                logout();
+                return [];
+            }
+
             console.error(`Error fetching from ${endpoint}: ${response.status}`);
             return [];
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error(`Error in fetchFromApi(${endpoint}):`, error);
@@ -43,19 +82,35 @@ async function fetchFromApi(endpoint) {
  * @returns {Promise<Object>} - Response data
  */
 async function createResource(endpoint, data) {
+    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
+    if (isGuestMode()) {
+        console.log(`Guest mode: Simulating create for ${endpoint}`);
+        return {
+            status: "success",
+            id: createID(), // Lokale ID generieren
+            // Weitere Felder je nach Bedarf
+        };
+    }
+
     try {
         console.log(`Creating resource at ${endpoint}:`, data);
-        
+
         const response = await fetch(getApiUrl(endpoint), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Authentication error. Please log in again.');
+                logout();
+                return { status: "error", message: "Authentication failed" };
+            }
+
             return await handleApiError(response, `creating resource at ${endpoint}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error(`Error creating resource at ${endpoint}:`, error);
@@ -71,19 +126,31 @@ async function createResource(endpoint, data) {
  * @returns {Promise<Object>} - Response data
  */
 async function updateResource(endpoint, id, data) {
+    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
+    if (isGuestMode()) {
+        console.log(`Guest mode: Simulating update for ${endpoint}/${id}`);
+        return { status: "success" };
+    }
+
     try {
         console.log(`Updating ${endpoint}/${id}:`, data);
-        
+
         const response = await fetch(`${getApiUrl(endpoint)}${id}/`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-        
+
         if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Authentication error. Please log in again.');
+                logout();
+                return { status: "error", message: "Authentication failed" };
+            }
+
             return await handleApiError(response, `updating ${endpoint}/${id}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error(`Error updating ${endpoint}/${id}:`, error);
@@ -98,15 +165,28 @@ async function updateResource(endpoint, id, data) {
  * @returns {Promise<Object>} - Response status
  */
 async function deleteResource(endpoint, id) {
+    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
+    if (isGuestMode()) {
+        console.log(`Guest mode: Simulating delete for ${endpoint}/${id}`);
+        return { status: "success" };
+    }
+
     try {
         const response = await fetch(`${getApiUrl(endpoint)}${id}/`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders()
         });
-        
+
         if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Authentication error. Please log in again.');
+                logout();
+                return { status: "error", message: "Authentication failed" };
+            }
+
             return await handleApiError(response, `deleting ${endpoint}/${id}`);
         }
-        
+
         return { status: "success" };
     } catch (error) {
         console.error(`Error deleting ${endpoint}/${id}:`, error);
@@ -124,19 +204,155 @@ async function handleApiError(response, action) {
     const errorText = await response.text();
     console.error(`Error ${action}: ${response.status}`);
     console.error(`Response body: ${errorText}`);
-    
+
     try {
         const errorJson = JSON.parse(errorText);
-        return { 
-            status: "error", 
+        return {
+            status: "error",
             details: errorJson,
             message: `Server returned ${response.status}`
         };
     } catch (parseError) {
-        return { 
-            status: "error", 
-            message: `Server returned ${response.status}: ${errorText}` 
+        return {
+            status: "error",
+            message: `Server returned ${response.status}: ${errorText}`
         };
+    }
+}
+
+/**
+ * Authenticates user with the backend
+ * @param {string} email - User email (used as username)
+ * @param {string} password - User password
+ * @returns {Promise<Object>} - Authentication response with token
+ */
+async function authenticateUser(email, password) {
+    try {
+        const response = await loginApiCall(email, password);
+        const data = await response.json();
+        console.log("Login response:", data);
+        
+        return processLoginResponse(data);
+    } catch (error) {
+        console.error("Authentication error:", error);
+        return { status: "error", message: error.message };
+    }
+}
+
+/**
+ * Makes the actual API call for login
+ * @param {string} email - User's email
+ * @param {string} password - User's password 
+ * @returns {Promise<Response>} - Fetch response
+ */
+async function loginApiCall(email, password) {
+    return await fetch(`${API_BASE_URL}user_auth/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: email,
+            password: password
+        })
+    });
+}
+
+/**
+ * Processes the login API response
+ * @param {Object} data - Response data
+ * @returns {Object} - Processed login result
+ */
+function processLoginResponse(data) {
+    if (data.token) {
+        return handleSuccessfulAuth(data);
+    } else {
+        return handleFailedAuth(data);
+    }
+}
+
+/**
+ * Handles successful authentication
+ * @param {Object} data - Response data with token
+ * @returns {Object} - Success response
+ */
+function handleSuccessfulAuth(data) {
+    localStorage.setItem('authToken', data.token);
+    localStorage.setItem('username', data.username);
+    localStorage.setItem('email', data.email);
+
+    return {
+        status: "success",
+        user: {
+            name: data.username,
+            email: data.email
+        }
+    };
+}
+
+/**
+ * Handles failed authentication
+ * @param {Object} data - Error response data
+ * @returns {Object} - Error response
+ */
+function handleFailedAuth(data) {
+    let errorMessage = "Login failed";
+    
+    if (data.non_field_errors) {
+        errorMessage = data.non_field_errors[0];
+    } else if (data.username) {
+        errorMessage = "Username error: " + data.username[0];
+    } else if (data.password) {
+        errorMessage = "Password error: " + data.password[0];
+    }
+    
+    return { status: "error", message: errorMessage };
+}
+
+/**
+ * Registers a new user
+ * @param {string} username - Username
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} repeatedPassword - Password confirmation
+ * @returns {Promise<Object>} - Registration response
+ */
+async function registerUser(username, email, password, repeatedPassword) {
+    try {
+        const response = await fetch(`${API_BASE_URL}user_auth/registration/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password,
+                repeated_password: repeatedPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return {
+                status: "error",
+                errors: data.errors || "Registration failed"
+            };
+        }
+
+        // Store authentication data if registration was successful
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data.email);
+
+        return {
+            status: "success",
+            user: {
+                name: data.username,
+                email: data.email,
+                userID: data.userID
+            }
+        };
+    } catch (error) {
+        console.error("Registration error:", error);
+        return { status: "error", message: error.message };
     }
 }
 
@@ -150,17 +366,85 @@ async function loadAllTasks() {
 }
 
 /**
- * Creates or updates a task
- * @param {Object} task - Task object
- * @returns {Promise<Object>} - Response data
+ * Creates a new task with the provided parameters
+ * @param {string} title - Title of the task
+ * @param {string} description - Description of the task
+ * @param {Array} assigned - Assigned contacts
+ * @param {string} date - Due date
+ * @param {string} prio - Priority (low, medium, urgent)
+ * @param {string} category - Category of the task
+ * @param {Array} subtasks - Subtasks
+ * @returns {Object} - Created task
+ */
+function createTask(title, description, assigned, date, prio, category, subtasks) {
+    const task = {
+        title: title,
+        description: description,
+        assignedTo: assigned || [],
+        dueDate: date,
+        priority: prio || "medium",
+        category: category || "todo",
+        subtasks: subtasks || [],
+        currentProgress: 0
+    };
+    tasks.push(task);
+    console.log("Task created:", task);
+    return task;
+}
+
+/**
+ * Checks the backend response for errors
+ * @param {Object} response - Backend response
+ * @returns {Object} - Validated response
+ * @throws {Error} If response has error status
+ */
+function checkResponseStatus(response) {
+    if (response.status === "error") {
+        const errorMsg = response.message || "Unknown error";
+        throw new Error(errorMsg);
+    }
+    return response;
+}
+
+/**
+ * Stores a task in the backend with improved error handling
+ * @param {Object} task - Task object to store
+ * @returns {Promise<Object>} - Backend response
  */
 async function storeTask(task) {
-    const formattedTask = formatTaskForBackend(task);
-    
-    if (formattedTask.taskID) {
-        return await updateResource('tasks', formattedTask.taskID, formattedTask);
-    } else {
-        return await createResource('tasks', formattedTask);
+    try {
+        const formattedTask = formatTaskForBackend(task);
+
+        let response;
+        if (formattedTask.taskID) {
+            response = await updateResource('tasks', formattedTask.taskID, formattedTask);
+        } else {
+            response = await createResource('tasks', formattedTask);
+        }
+
+        return checkResponseStatus(response);
+    } catch (error) {
+        console.error("Error saving task:", error);
+        return { status: "error", message: error.message };
+    }
+}
+
+/**
+ * Speichert alle Tasks in der Datenbank
+ * @returns {Promise<Object>} Ergebnis des Speicherns
+ */
+async function storeTasks() {
+    try {
+        // Jeder Task wird einzeln gespeichert
+        const savingPromises = tasks.map(task => storeTask(task));
+        await Promise.all(savingPromises);
+        return { status: "success" };
+    } catch (error) {
+        console.error("Error storing tasks:", error);
+        return {
+            status: "error",
+            message: "Failed to store all tasks: " + error.message
+        };
     }
 }
 
@@ -241,7 +525,7 @@ async function deleteUserItem(userId) {
  */
 function formatTaskForBackend(task) {
     const formatted = { ...task };
-    
+
     // Format assignedTo for the backend
     if (formatted.assignedTo && Array.isArray(formatted.assignedTo)) {
         formatted.assignedTo = formatted.assignedTo.map(contact => {
@@ -256,7 +540,7 @@ function formatTaskForBackend(task) {
             return { contactID: contact };
         });
     }
-    
+
     // Format subtasks for the backend
     if (formatted.subtasks && Array.isArray(formatted.subtasks)) {
         formatted.subtasks = formatted.subtasks.map(subtask => ({
@@ -264,16 +548,16 @@ function formatTaskForBackend(task) {
             done: Boolean(subtask.done)
         }));
     }
-    
+
     // Ensure valid values for priority and category
     if (formatted.priority && !["low", "medium", "urgent"].includes(formatted.priority)) {
         formatted.priority = "medium";
     }
-    
+
     if (formatted.category && !["todo", "inprogress", "done"].includes(formatted.category)) {
         formatted.category = "todo";
     }
-    
+
     return formatted;
 }
 
@@ -311,11 +595,28 @@ function storeActualUser(user) {
 }
 
 function loadActualUser() {
+    // Try to load user from authentication data first
+    const token = localStorage.getItem('authToken');
+    const username = localStorage.getItem('username');
+    const email = localStorage.getItem('email');
+
+    if (token && username) {
+        const user = {
+            name: username,
+            email: email
+        };
+        storeActualUser(user);
+        return user;
+    }
+
     return getFromLocalStorage('actualUser');
 }
 
 function deleteActualUser() {
     removeFromLocalStorage('actualUser');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
 }
 
 function storeRememberMe(value) {
@@ -330,27 +631,46 @@ function deleteRememberMe() {
     removeFromLocalStorage('rememberMe');
 }
 
+/**
+ * Checks if user is authenticated
+ * @returns {boolean} - True if user has valid auth token
+ */
+function isAuthenticated() {
+    return localStorage.getItem('authToken') !== null;
+}
+
+/**
+ * Logs out the current user
+ */
+function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    removeFromLocalStorage('actualUser');
+
+    // Keep remember me settings if desired
+    if (!localStorage.getItem('rememberMe')) {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberedPassword');
+    }
+
+    window.location.href = 'start.html';
+}
+
 // Ensure a default user exists in the system
 async function ensureDefaultUserExists() {
+    // This function is less needed with Django authentication
+    // But keeping it for backward compatibility
     try {
         const users = await loadAllUsers();
-        
+
         if (!users || users.length === 0) {
-            console.log("No users found. Creating a default user...");
-            
-            const defaultUser = {
-                name: "Default User",
-                email: "default@example.com",
-                password: "defaultpassword" // In production, use a secure password
-            };
-            
-            await storeUser(defaultUser);
-            return await loadAllUsers();
+            console.log("No users found in the system.");
         }
-        
+
         return users;
     } catch (error) {
-        console.error("Error ensuring default user:", error);
+        console.error("Error checking users:", error);
         return [];
     }
 }

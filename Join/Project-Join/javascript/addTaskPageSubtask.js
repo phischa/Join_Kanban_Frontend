@@ -187,13 +187,27 @@ function checkSubtaskEventArea(targetElement) {
 }
 
 /**
- * function finalizes the subtasks by adding them to an array with all
- * the necessary Information, ready to attach them to the task data structure.
+ * Prepares subtasks for backend submission
+ * @returns {Array} - Formatted subtasks
+ */
+function prepareSubtasksForBackend() {
+  const formattedSubtasks = [];
+  
+  for (let i = 0; i < subtasksOfAddPage.length; i++) {
+    formattedSubtasks.push({
+      subTaskName: subtasksOfAddPage[i],
+      done: false
+    });
+  }
+  
+  return formattedSubtasks;
+}
+
+/**
+ * Finalizes subtasks with correct format
  */
 function finalizeSubtasks() {
-  for (let i = 0; i < subtasksOfAddPage.length; i++) {
-    finalSubtasksOfAddPage.push(createSubtask(subtasksOfAddPage[i]));
-  }
+  finalSubtasksOfAddPage = prepareSubtasksForBackend();
 }
 
 /**

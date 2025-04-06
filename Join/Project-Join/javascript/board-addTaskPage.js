@@ -7,7 +7,6 @@ async function openAddTask(number){
     addContactsToPage();
 }
 
-
 /**
 * loading All Settings to run Add-Task
 */
@@ -43,40 +42,88 @@ function renderAddTaskTemplateLightBox(){
     content.innerHTML = templateAddTaskLightbox();
 }
 
-
 /**
-* will happen after clicking 'create Task' button.
-*/
-async function submitTaskOnBoard(){
-        let title = document.getElementById("ltitlename");
-        let description = document.getElementById("ldescriptionname").value;
-        let assigned = assignedContacts;
-        let date = document.getElementById("ldatename").value;
-        let prio = priority;
-        let category = document.getElementById("lcategoryname").value;
-        finalizeSubtasks();
-        let subtasks = finalSubtasksOfAddPage;
-        createTask(title.value, description, assigned, date, prio, category, subtasks);
-        await storeTasks();
-        clearRenderArea();
-        title.value = title.defaultValue;
-        clearForm();
-        await setTaskToBoard();
-        currentColumn = 0;
+ * Collects task data from the board form
+ * @returns {Object} - Task data object
+ */
+function collectBoardTaskData() {
+  const title = document.getElementById("ltitlename").value;
+  const description = document.getElementById("ldescriptionname").value;
+  const assigned = assignedContacts;
+  const date = document.getElementById("ldatename").value;
+  const prio = priority;
+  const category = document.getElementById("lcategoryname").value;
+  
+  finalizeSubtasks();
+  const subtasks = finalSubtasksOfAddPage;
+  
+  return { title, description, assigned, date, prio, category, subtasks };
 }
 
+/**
+ * Cleans up the board form after task creation
+ */
+function cleanupBoardTaskForm() {
+  const title = document.getElementById("ltitlename");
+  clearRenderArea();
+  title.value = title.defaultValue;
+  clearForm();
+}
+
+/**
+ * Handles errors when saving a board task
+ * @param {Object} error - Error object
+ */
+function handleBoardTaskSaveError(error) {
+  console.error("Failed to save board task:", error);
+  const message = error.message || "Unknown error";
+  alert("Task could not be saved: " + message);
+}
+
+/**
+ * Saves the board task and updates the view
+ * @param {Object} taskData - Task data
+ * @returns {Promise<void>}
+ */
+async function saveBoardTaskAndUpdate(taskData) {
+  try {
+    const newTask = createTask(
+      taskData.title, taskData.description, taskData.assigned,
+      taskData.date, taskData.prio, taskData.category, taskData.subtasks
+    );
+    
+    const response = await storeTask(newTask);
+    
+    if (response.status === "success") {
+      cleanupBoardTaskForm();
+      await setTaskToBoard();
+      currentColumn = 0;
+    } else {
+      handleBoardTaskSaveError(response);
+    }
+  } catch (error) {
+    handleBoardTaskSaveError(error);
+  }
+}
+
+/**
+ * Creates and saves a task from the board
+ * @returns {Promise<void>}
+ */
+async function submitTaskOnBoard() {
+  const taskData = collectBoardTaskData();
+  await saveBoardTaskAndUpdate(taskData);
+}
 
 /**
 * to close the Windows Add-Task-Windows
 */
 async function setTaskToBoard() {
-    // Close the modal
     hideBlackbox();
     delteEventListener();
     
     // Small delay to ensure API processing
     setTimeout(async () => {
-        // Reload data
         await baordLoadTasks();
         
         // Optional functions if they exist

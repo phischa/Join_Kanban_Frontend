@@ -217,24 +217,76 @@ function clearForm() {
 }
 
 /**
- * submmits the task with all necessary information then redirects to the board-page
+ * Collects all task data from the form
+ * @returns {Object} - Task data object
  */
-function submitTask() {
-  let title = document.getElementById("ltitlename");
-  let description = document.getElementById("ldescriptionname").value;
-  let assigned = assignedContacts;
-  let date = document.getElementById("ldatename").value;
-  let prio = priority;
-  let category = document.getElementById("lcategoryname").value;
+function collectTaskData() {
+  const title = document.getElementById("ltitlename").value;
+  const description = document.getElementById("ldescriptionname").value;
+  const assigned = assignedContacts;
+  const date = document.getElementById("ldatename").value;
+  const prio = priority;
+  const category = document.getElementById("lcategoryname").value;
+  
   finalizeSubtasks();
-  let subtasks = finalSubtasksOfAddPage;
-  createTask(title.value, description, assigned, date, prio, category, subtasks);
-  storeTasks();
+  const subtasks = finalSubtasksOfAddPage;
+  
+  return { title, description, assigned, date, prio, category, subtasks };
+}
+
+/**
+ * Cleans up the form after successful task creation
+ */
+function cleanupTaskForm() {
+  const title = document.getElementById("ltitlename");
   clearRenderArea();
   title.value = title.defaultValue;
   clearForm();
   showModal();
-  setTimeout(goToBoard, 500);
+}
+
+/**
+ * Handles errors when saving a task
+ * @param {Object} error - Error object
+ */
+function handleTaskSaveError(error) {
+  console.error("Failed to save task:", error);
+  const message = error.message || "Unknown error";
+  alert("Task could not be saved: " + message);
+}
+
+/**
+ * Saves the task and shows feedback
+ * @param {Object} taskData - Task data
+ * @returns {Promise<void>}
+ */
+async function saveTaskAndRedirect(taskData) {
+  try {
+    const newTask = createTask(
+      taskData.title, taskData.description, taskData.assigned,
+      taskData.date, taskData.prio, taskData.category, taskData.subtasks
+    );
+    
+    const response = await storeTask(newTask);
+    
+    if (response.status === "success") {
+      cleanupTaskForm();
+      setTimeout(goToBoard, 500);
+    } else {
+      handleTaskSaveError(response);
+    }
+  } catch (error) {
+    handleTaskSaveError(error);
+  }
+}
+
+/**
+ * Creates and saves a task from form data
+ * @returns {Promise<void>}
+ */
+async function submitTask() {
+  const taskData = collectTaskData();
+  await saveTaskAndRedirect(taskData);
 }
 
 /**

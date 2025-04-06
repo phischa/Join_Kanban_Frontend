@@ -5,11 +5,53 @@ let remember = '';
  */
 async function initLogin() {
     isLocalRemember();
-    await loadUsers();
     await loadRememberMe();
-    deleteActualUser();
-    await isRemember();
     removeRedMail();
+    setupFormListener();
+}
+
+/**
+ * Sets up the event listener for the login form
+ */
+function setupFormListener() {
+    setupFormSubmitPrevention();
+    setupLoginButtonHandler();
+}
+
+/**
+ * Prevents the form from being submitted normally
+ */
+function setupFormSubmitPrevention() {
+    const form = document.getElementById('form');
+    
+    if (form) {
+        form.onsubmit = function(e) {
+            console.log("Form submit prevented");
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            return false;
+        };
+    }
+}
+
+/**
+ * Sets up the login button click handler
+ */
+function setupLoginButtonHandler() {
+    const loginBtn = document.getElementById('login-btn');
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            console.log("Login button clicked");
+            handleManualLogin();
+        });
+    }
 }
 
 /**
@@ -21,42 +63,106 @@ function isLocalRemember() {
     let check = document.getElementById('remember-me')
     if (rememberStorage) {
         check.src = '../img/icons/checkbox-checked.svg';
+        remember = true;
     } else {
         check.src = '../img/icons/checkbox-default.svg';
+        remember = false;
     }
 }
 
 /**
- * This function get the input values and saves them in the local storage , if the remember me checkbox is checked.
+ * Handles login when button is clicked
  */
-async function onsubmitLogin() {
-    let email = document.getElementById('email').value;
-    let password = document.getElementById('password').value;
-    if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
-        localStorage.setItem('rememberedPassword', password);
-    }
+async function handleManualLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    handleRememberMe(email, password);
     removeRedMail();
     await login(email, password);
 }
 
 /**
- * This function checks if email and password match the ones in the database. If so it logs the user in, if not it show error.
+ * Handles remember me functionality
  */
-async function login(email, password) {
-    user = users.find(u => u.email == email && u.password == password);
-    if (user) {
-        actualUser = user;
-        await storeActualUser();
-        window.location.href = 'summary.html';
-    } else {
-        loginCheck(email);
+function handleRememberMe(email, password) {
+    if (remember) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberedPassword', password);
     }
 }
 
+/**
+ * Legacy function for compatibility
+ */
+async function onsubmitLogin() {
+    console.log("onsubmitLogin called - forwarding to handleManualLogin");
+    await handleManualLogin();
+    return false;
+}
+
+/**
+ * This function sends a login request to the backend
+ */
+async function login(email, password) {
+    try {
+        console.log("Attempting login with:", email);
+        const result = await authenticateUser(email, password);
+        
+        handleLoginResult(result);
+    } catch (error) {
+        console.error('Login error:', error);
+        colorRedMail();
+        wrongMailText();
+    }
+}
+
+/**
+ * Handles login result
+ */
+function handleLoginResult(result) {
+    console.log("Login result:", result);
+    
+    if (result.status === "success") {
+        storeActualUser(result.user);
+        window.location.href = 'summary.html';
+    } else {
+        handleLoginError(result.message);
+    }
+}
+
+/**
+ * Handles login errors
+ */
+function handleLoginError(errorMessage) {
+    console.log("Login error:", errorMessage);
+    
+    const errorMsg = errorMessage.toLowerCase();
+    if (isEmailRelatedError(errorMsg)) {
+        colorRedMail();
+        wrongMailText();
+    } else {
+        colorRedPassword();
+        wrongPasswordText();
+    }
+}
+
+/**
+ * Checks if error is related to email/username
+ */
+function isEmailRelatedError(errorMsg) {
+    return errorMsg.includes('user') || 
+           errorMsg.includes('username') || 
+           errorMsg.includes('email');
+}
+
+/**
+ * This function checks email format and displays appropriate error
+ */
 function loginCheck(email) {
-    email = users.find(u => u.email == email);
-    if (!email) {
+    // Check if email has valid format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
         colorRedMail();
         wrongMailText();
     } else {
@@ -68,9 +174,37 @@ function loginCheck(email) {
 /**
  * This function logs in a guest user. 
  */
-async function guestLogin() {
-    deleteActualUser();
-    window.location.href = 'summary.html';
+function guestLogin() {
+    console.log("Logging in as guest user");
+    
+    // Wichtig: Event stoppen, falls es von einem Button-Klick kommt
+    event && event.preventDefault && event.preventDefault();
+    
+    // Authentifizierungsdaten löschen
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    
+    // Gast-Modus aktivieren
+    localStorage.setItem('guestMode', 'true');
+    
+    // Basis-Benutzerdaten für den Gast speichern
+    const guestUser = {
+        name: "Guest User", 
+        email: "guest@example.com"
+    };
+    saveToLocalStorage('actualUser', guestUser);
+    
+    console.log("Guest mode activated");
+    
+    // Zur Summary-Seite weiterleiten - mit timeout um sicherzustellen, dass der Storage aktualisiert wurde
+    setTimeout(function() {
+        console.log("Redirecting to summary page...");
+        window.location.href = 'summary.html';
+    }, 200);
+    
+    // Wichtig: false zurückgeben, um das Standardverhalten zu verhindern
+    return false;
 }
 
 /**
@@ -88,24 +222,32 @@ function setRememberMe() {
 }
 
 /**
- * Thsi function checks onload if global remember is true. Based on that it gets Mail and Password from the local storage and dierects to login().
+ * This function loads any remembered credentials and autofills the login form
  */
-async function isRemember() {
+async function loadRememberMe() {
     let rememberLocal = localStorage.getItem('rememberMe');
     if (rememberLocal) {
         remember = true;
-    } else {
-        remember = false;
-    }
-    if (remember) {
+        
         let rememberedEmail = localStorage.getItem('rememberedEmail');
         let rememberedPassword = localStorage.getItem('rememberedPassword');
-        await login(rememberedEmail, rememberedPassword);
+        
+        if (rememberedEmail && rememberedPassword) {
+            document.getElementById("email").value = rememberedEmail;
+            document.getElementById("password").value = rememberedPassword;
+            
+            // Optional: Auto-login with remembered credentials
+            if (remember) {
+                await login(rememberedEmail, rememberedPassword);
+            }
+        }
+    } else {
+        remember = false;
     }
 }
 
 /**
- * This function checks iff the "remember me" checkbox is checked and changes the icon based on that info.
+ * This function checks if the "remember me" checkbox is checked and changes the icon based on that info.
  */
 function rememberMe() {
     let check = document.getElementById('remember-me');
@@ -113,19 +255,6 @@ function rememberMe() {
         check.src = '../img/icons/checkbox-checked.svg';
     } else {
         check.src = '../img/icons/checkbox-default.svg';
-    }
-}
-
-/**
- * This function load the remembered email forim the database.
- */
-async function loadRememberMe() {
-    let rememberedEmail = localStorage.getItem('rememberedEmail');
-    let rememberedPassword = localStorage.getItem('rememberedPassword');
-    if (rememberedEmail && rememberedPassword) {
-        document.getElementById("email").value = rememberedEmail;
-        document.getElementById("password").value = rememberedPassword;
-        await login();
     }
 }
 
