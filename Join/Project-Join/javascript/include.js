@@ -57,38 +57,109 @@ function closeNavbar() {
 }
 
 /**
- * function gets the initials of the name of the user which is logged in and gives them to the next function.
+ * function gets the initials of the name of the user which is logged in
  */
 async function initialsOf() {
-  if (actualUser && actualUser["name"]) {
-    let words = actualUser["name"].split(" ");
-    let initials = "";
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      initials += word.charAt(0).toUpperCase();
-    }
-    addInitialsToHeader(initials);
+  // Prüfen, ob das Element existiert
+  const initialNameElement = document.getElementById("initialname");
+  if (!initialNameElement) {
+    console.log("initialname element not found");
+    return;
+  }
+  
+  const userInfo = getUserInfoFromStorage();
+  displayUserInitials(userInfo);
+}
+
+/**
+ * Holt die Benutzerinformationen aus dem Speicher
+ * @returns {Object} Objekt mit Benutzerinformationen
+ */
+function getUserInfoFromStorage() {
+  const username = localStorage.getItem('username');
+  const isGuest = localStorage.getItem('guestMode') === 'true';
+  const actualUserObj = getActualUserObject();
+  
+  return { username, isGuest, actualUserObj };
+}
+
+/**
+ * Holt das actualUser Objekt aus dem localStorage
+ * @returns {Object|null} Das actualUser Objekt oder null
+ */
+function getActualUserObject() {
+  const actualUserJson = localStorage.getItem('actualUser');
+  if (!actualUserJson) return null;
+  
+  try {
+    return JSON.parse(actualUserJson);
+  } catch (e) {
+    console.error("Error parsing actualUser", e);
+    return null;
+  }
+}
+
+/**
+ * Zeigt die Benutzerinitialen basierend auf den verfügbaren Informationen an
+ * @param {Object} userInfo Benutzerinformationen
+ */
+function displayUserInitials(userInfo) {
+  const { username, actualUserObj, isGuest } = userInfo;
+  
+  if (username) {
+    addUserInitialsToHeader(username);
+  } else if (actualUserObj && actualUserObj.name) {
+    addUserInitialsToHeader(actualUserObj.name);
+  } else if (isGuest) {
+    addLetterGToHeader();
   } else {
     addLetterGToHeader();
   }
 }
+
 /**
- * function inserts the initials into the div with the id='initialname'
- * @param {string} initials
+ * Extrahiert Initialen aus einem Namen
+ * @param {string} name - Der Name
+ * @returns {string} - Die Initialen
  */
-function addInitialsToHeader(initials) {
-  let insert = document.getElementById("initialname");
-  insert.innerHTML = "";
-  insert.innerHTML = `${initials}`;
+function getInitialsFromName(name) {
+  const words = name.split(" ");
+  let initials = "";
+  
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    if (word.length > 0) {
+      initials += word.charAt(0).toUpperCase();
+    }
+  }
+  
+  return initials;
 }
 
 /**
- * function adds letter G for guest into the div with the id='initialname'
+ * Fügt die Benutzerinitialen in den Header ein
+ * @param {string} name - Der Name
+ */
+function addUserInitialsToHeader(name) {
+  const initials = getInitialsFromName(name);
+  const element = document.getElementById("initialname");
+  
+  if (element) {
+    element.innerHTML = "";
+    element.innerHTML = initials;
+  }
+}
+
+/**
+ * function adds letter G for guest into the div
  */
 function addLetterGToHeader() {
-  let insert = document.getElementById("initialname");
-  insert.innerHTML = "";
-  insert.innerHTML = "G";
+  const insert = document.getElementById("initialname");
+  
+  if (insert) {
+    insert.innerHTML = "";
+    insert.innerHTML = "G";
+  }
 }
 
 function capitalizeName(name) {
