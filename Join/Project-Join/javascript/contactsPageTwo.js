@@ -261,240 +261,25 @@ function removeListenerForAddContact(){
     statusValidationName.removeEventListener("input", capitalizeFirstLetterInName);
 }
 
-let myStatusEditContact = false;
-/** 
- * Opens the window edit contact
-*/
-function openEditContact(i) {
-    clearInputFields();
-    styleEditContact();
-    getSelectedContact(i);
-    showAddOrEditContactWindow();
-    distanceInputField();
-    document.getElementById('add-contact-bg').classList.remove('d-none');
-    addListenerForEditContact();
-    myStatusEditContact = false;
-    statusOverwriting = false;
-}
-
-/**
- * Styles the edit contact window
- */
-function styleEditContact(){
-    document.getElementById('text-contact').innerHTML = 'Edit contact';
-    document.getElementById('text-taskarebetter').classList.add('d-none');
-    document.getElementById('join-logo').style.transform = "translateY(-10.968rem)";
-    document.getElementById('container-addcontact').classList.add('d-none');
-    document.getElementById('container-editcontact').classList.remove('d-none');
-    document.getElementById('button-save').style.backgroundColor='#2A3647';
-    if(screen.width < 1000){
-    document.getElementById('requiredtext').style.marginTop = "0";
-    document.getElementById('requiredemail').style.marginTop = "0";
-    }
-}
-
-/** 
- * Clears the input fields
-*/
-function clearInputFields() {
-    document.getElementById('ltitlename').value = '';
-    document.getElementById('ltitleemail').value = '';
-    document.getElementById('ltitlephone').value = '';
-}
-
-/** 
- * Shows the add or edit contact window
-*/
-function showAddOrEditContactWindow() {
-    document.getElementById('add-contact').classList.remove('animationcloseaddcontact');
-    document.body.style.overflowY = 'hidden';
-}
-
-/** 
- * Closes the add contact function
-*/
-function closeAddContact() {
-    document.getElementById('add-contact').classList.add('animationcloseaddcontact');
-    setTimeout(closeWindow, 1500);
-}
-
-/** 
- * Closes the window
-*/
-function closeWindow() {
-    document.getElementById('add-contact-bg').classList.add('d-none');
-    document.getElementById('mobile-contact-view').classList.add('d-none');
-    document.getElementById('mobile-edit-delete-c').classList.add('d-none');
-    document.body.style.overflowY = 'hidden';
-}
-
-/** 
- * Loads available contacts
-*/
-function getSelectedContact(i) {
-    document.getElementById('ltitlename').value = `${sortedContactsByName[i]["name"]}`;
-    document.getElementById('ltitleemail').value = `${sortedContactsByName[i]["email"]}`;
-    document.getElementById('ltitlephone').value = `${sortedContactsByName[i]["phone"]}`;
-    document.getElementById('initial-person-card').classList.add('d-none');
-    document.getElementById('text-initial').innerHTML = `${sortedContactsByName[i]["initials"]}`;
-    document.getElementById('color-icon').style.backgroundColor = `${sortedContactsByName[i]["color"]}`;
-    lastIndex = 2000;
-}
-
 /** 
  * Creates a new contact
 */
-function createContactOnContactPage() {
-    let name = document.getElementById('ltitlename').value;
-    let email = document.getElementById('ltitleemail').value;
-    let phone = document.getElementById('ltitlephone').value;
+async function createContactOnContactPage() {
+    const name = document.getElementById('ltitlename').value;
+    const email = document.getElementById('ltitleemail').value;
+    const phone = document.getElementById('ltitlephone').value;
 
-    createContact(name, email, phone);
+    await createContact(name, email, phone);
+    handleSuccessfulContactCreation();
+}
+
+/**
+ * Behandelt erfolgreiche Kontakterstellung
+ */
+function handleSuccessfulContactCreation() {
     removeListenerForAddContact();
     deletedContactList();
     renderContactList();
     document.getElementById('text-successfulcreated').innerHTML = 'Contact successfully created';
     closeAddContactWithAnimation();
-}
-
-/** 
- * Saves the edit contact
-*/
-let statusOverwriting = false;
-function saveEditContact(i) {
-    let name = document.getElementById('ltitlename').value;
-    let existedName = `${sortedContactsByName[i]["name"]}`;
-    let email = document.getElementById('ltitleemail').value;
-    let existedEmail = `${sortedContactsByName[i]["email"]}`;
-    let phone = document.getElementById('ltitlephone').value;
-    let existedPhone = `${sortedContactsByName[i]["phone"]}`;
-
-    if(!name.localeCompare(existedName) && !email.localeCompare(existedEmail) && !phone.localeCompare(existedPhone)) {
-        closeAddContactWithAnimation();
-    } else {
-        saveSelectedContact(name, email, phone,i);
-    }
-}
-
-/**
- * Contains all sub functions for saving the edit contact
- */
-function saveSelectedContact(name, email, phone,i){
-    if(!statusOverwriting){
-        overwritingAvaibleContact(name, email, phone);
-        statusOverwriting = true;
-    }
-    removeListenerForEditContact();
-    document.getElementById('text-successfulcreated').innerHTML = 'Contact successfully edited';
-    openContact(i);
-    renderContactContainer(i);
-    deletedContactList();
-    renderContactList();
-    closeAddContactWithAnimation();
-}
-
-/**
- * Updates local contact data
- * @param {number} index - Index of the contact in the array
- * @param {string} name - Name of the contact
- * @param {string} email - Email of the contact
- * @param {string} phone - Phone number of the contact
- */
-function updateLocalContact(index, name, email, phone) {
-    contacts[index].name = name;
-    contacts[index].email = email;
-    contacts[index].phone = phone;
-    contacts[index].initials = getInitials(name);
-}
-
-/**
- * Prepares contact data for the backend
- * @param {number} index - Index of the contact in the array
- * @param {string} name - Name of the contact
- * @param {string} email - Email of the contact
- * @param {string} phone - Phone number of the contact
- * @returns {Object} - Formatted contact data
- */
-function prepareContactForBackend(index, name, email, phone) {
-    return {
-        contactID: contacts[index].contactID,
-        name: name,
-        email: email,
-        phone: phone,
-        color: contacts[index].color,
-        initials: getInitials(name)
-    };
-}
-
-/**
- * Saves contact data to the backend
- * @param {Object} contactData - Contact data
- * @returns {Promise<Object>} - API response
- */
-async function saveContactToBackend(contactData) {
-    try {
-        const response = await storeContact(contactData);
-        handleContactSaveResponse(response);
-        return response;
-    } catch (error) {
-        handleContactSaveError(error);
-        return { status: "error", message: error.message };
-    }
-}
-
-/**
- * Handles the response from the backend
- * @param {Object} response - API response
- */
-function handleContactSaveResponse(response) {
-    if (response.status !== "success") {
-        console.error("Failed to update contact in backend:", response);
-        // Fallback: Update local storage
-        localStorage.setItem('contacts', JSON.stringify(contacts));
-    } else {
-        console.log("Contact successfully updated");
-    }
-}
-
-/**
- * Handles errors during backend communication
- * @param {Error} error - Error that occurred
- */
-function handleContactSaveError(error) {
-    console.error("Error updating contact:", error);
-    // Fallback: Update local storage
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-}
-
-/**
- * Main function for updating a contact
- * @param {string} name - Name of the contact
- * @param {string} email - Email of the contact
- * @param {string} phone - Phone number of the contact
- */
-async function overwritingAvaibleContact(name, email, phone) {
-    // Update local data
-    updateLocalContact(editIndex, name, email, phone);
-    
-    // Prepare data for backend
-    const contactData = prepareContactForBackend(editIndex, name, email, phone);
-    
-    // Send to backend
-    await saveContactToBackend(contactData);
-}
-
-/** 
- * Closes the add or edit contact with a slide effect
-*/
-function closeAddContactWithAnimation() {
-    closeAddContact();
-    setTimeout(successfulSent, 1500);
-    setTimeout(closeSuccessfulSent, 2300);
-}
-
-/** 
- * Closes the window successfully
-*/
-function sucessfulCreatedDisable() {
-    document.getElementById('text-successfulcreated').classList.add('d-none');
 }

@@ -19,21 +19,79 @@ function deleteContactOfContactPage() {
     document.getElementById('delete').classList.remove('d-none');
 }
 
-/** 
-*  This function deletes the selected contact in the storage.
-*/
-function finallyDeleted(){
-    let contactID;
-    contactID = contacts[editIndex]['contactID'] + '';
+/**
+ * Löscht einen Kontakt anhand seiner ID
+ * @param {string|number} contactID - Kontakt-ID
+ * @returns {Promise<boolean>} - Erfolgsstatus
+ */
+async function deleteContact(contactID) {
+    try {
+        const response = await deleteContactItem(contactID);
+        return await processDeleteResponse(response, contactID);
+    } catch (error) {
+        return handleDeleteError(error, contactID);
+    }
+}
 
-    deleteContact(contactID);
+/**
+ * Verarbeitet die Antwort nach dem Löschen eines Kontakts
+ */
+async function processDeleteResponse(response, contactID) {
+    if (response.status === "success") {
+        removeContactFromLocalArray(contactID);
+        saveToLocalStorage('contacts', contacts);
+        return true;
+    } else {
+        const errorMsg = response.message || "Unbekannter Fehler";
+        throw new Error(`Kontakt konnte nicht gelöscht werden: ${errorMsg}`);
+    }
+}
+
+/**
+ * Behandelt Fehler während des Löschens eines Kontakts
+ */
+function handleDeleteError(error, contactID) {
+    console.error("Fehler beim Löschen des Kontakts:", error);
+
+    // Aktualisiere trotzdem lokalen Status für bessere UX
+    removeContactFromLocalArray(contactID);
+    saveToLocalStorage('contacts', contacts);
+
+    return false;
+}
+
+/**
+ * Entfernt einen Kontakt aus dem lokalen Array anhand seiner ID
+ */
+function removeContactFromLocalArray(contactID) {
+    const index = contacts.findIndex(c => c.contactID == contactID);
+    if (index !== -1) {
+        contacts.splice(index, 1);
+    }
+}
+
+/** 
+ * Löscht den ausgewählten Kontakt im Speicher.
+ */
+async function finallyDeleted() {
+    const contactID = contacts[editIndex]['contactID'] + '';
+    await deleteContact(contactID);
+
+    handleSuccessfulDeletion();
+}
+
+/**
+ * Behandelt die erfolgreiche Löschung eines Kontakts
+ */
+function handleSuccessfulDeletion() {
     deletedContactList();
     renderContactList();
     closeDeleteContact();
     closeAddContact();
     document.getElementById('person-card').classList.add('d-none');
-    if(screen.width < 1200){
-    backToContactList();
+
+    if (screen.width < 1200) {
+        backToContactList();
     }
 }
 
@@ -110,7 +168,7 @@ function closeDeleteContact() {
 /** 
 *  This function add all Listeners for the edit contact window.
 */
-function addListenerForEditContact(){
+function addListenerForEditContact() {
     let statusValidationName = document.getElementById('ltitlename');
     let eventButton = document.getElementById('button-save');
     let allInputFields = [document.getElementById('ltitlename'), document.getElementById('ltitleemail'), document.getElementById('ltitlephone')];
@@ -126,7 +184,7 @@ function addListenerForEditContact(){
 /** 
 *  This function remove all Listeners for the edit contact window.
 */
-function removeListenerForEditContact(){
+function removeListenerForEditContact() {
     let statusValidationName = document.getElementById('ltitlename');
     let eventButton = document.getElementById('button-save');
     let allInputFields = [document.getElementById('ltitlename'), document.getElementById('ltitleemail'), document.getElementById('ltitlephone')];
@@ -142,30 +200,30 @@ function removeListenerForEditContact(){
 /**
  *  This function checks the validity of input name, e-mail and phone. If it is correct, the function saveContact() opens. 
  */
-function checkEditContactValidityNameEmailPhone(){
+function checkEditContactValidityNameEmailPhone() {
     let statusValidationName = document.getElementById('ltitlename');
     let statusValidationEmail = document.getElementById('ltitleemail');
     let statusValidationPhone = document.getElementById('ltitlephone');
     let email = document.getElementById('ltitleemail').value;
     let isAvailable = isThisEmailAvailable(email);
-       
-    if(isAvailable && email != contacts[editIndex].email){
+
+    if (isAvailable && email != contacts[editIndex].email) {
         ifEmailAvailableBorderRed();
-    } else{
-        ifEmailNotAvailableBorderRed();
-       if(statusValidationName.checkValidity() && statusValidationEmail.checkValidity() && statusValidationPhone.checkValidity()){
-        changeColorButton();
-        saveTheEditContact();
     } else {
-        disableButtonAndStartSave();
+        ifEmailNotAvailableBorderRed();
+        if (statusValidationName.checkValidity() && statusValidationEmail.checkValidity() && statusValidationPhone.checkValidity()) {
+            changeColorButton();
+            saveTheEditContact();
+        } else {
+            disableButtonAndStartSave();
+        }
     }
-  }
 }
 
 /**
  *  This function saved once the edit contact
  */
-function saveTheEditContact(){
+function saveTheEditContact() {
     let eventButton = document.getElementById('button-save');
 
     eventButton.addEventListener("click", function () {
@@ -179,64 +237,64 @@ function saveTheEditContact(){
 /**
  * This function change the color of the button save.
  */
-function changeColorButton(){
+function changeColorButton() {
     document.getElementById('button-save').disabled = false;
-    document.getElementById('button-save').style.backgroundColor='#2A3647';
+    document.getElementById('button-save').style.backgroundColor = '#2A3647';
     document.getElementById('button-save').style.cursor = "pointer";
 }
 
 /**
  * This function is if the email available then the border will be red.  
  */
-function ifEmailAvailableBorderRed(){
+function ifEmailAvailableBorderRed() {
     disableButtonAndStartSave();
-    document.getElementById('ltitleemail').style.outline = '2px solid red'; 
+    document.getElementById('ltitleemail').style.outline = '2px solid red';
     document.getElementById('requiredemail').classList.remove('d-none');
 }
 
 /**
  * This function is if the email not available then the border will be white. 
  */
-function ifEmailNotAvailableBorderRed(){
-    document.getElementById('ltitleemail').style.outline = ''; 
+function ifEmailNotAvailableBorderRed() {
+    document.getElementById('ltitleemail').style.outline = '';
     document.getElementById('requiredemail').classList.add('d-none');
 }
-    
- /**
-  *  This function charge the color and enable the button and start the function saveEditContact.
- */
-function disableButtonAndStartSave(){
+
+/**
+ *  This function charge the color and enable the button and start the function saveEditContact.
+*/
+function disableButtonAndStartSave() {
     document.getElementById('button-save').disabled = true;
-    document.getElementById('button-save').style.backgroundColor='#E5E5E5';
+    document.getElementById('button-save').style.backgroundColor = '#E5E5E5';
     document.getElementById('button-save').style.cursor = "default";
 }
-    
- /**
-  *  This function checks the validity of input name, e-mail and phone. If the mouse is above the button and if the validation isn't correct, 
-  *  the border of the elements ltitlename, ltitleemail, ltitlephone and text "This field is required" will be red.
+
+/**
+ *  This function checks the validity of input name, e-mail and phone. If the mouse is above the button and if the validation isn't correct, 
+ *  the border of the elements ltitlename, ltitleemail, ltitlephone and text "This field is required" will be red.
 */
-function validityFalseAboveButtonRedBorderEditContact(){
+function validityFalseAboveButtonRedBorderEditContact() {
     let statusValidationName = document.getElementById('ltitlename');
     let statusValidationEmail = document.getElementById('ltitleemail');
     let statusValidationPhone = document.getElementById('ltitlephone');
-   
+
     removesFocusFromInputField();
     changeBackColorFromButtonEditContactPage();
-    checkValidationByTrueBorderRed(statusValidationName,statusValidationEmail,statusValidationPhone);
+    checkValidationByTrueBorderRed(statusValidationName, statusValidationEmail, statusValidationPhone);
 }
 
 /**
  *  This function changes back the color for the create contact button on the addcontact page.
  */
-function changeBackColorFromButtonEditContactPage(){
+function changeBackColorFromButtonEditContactPage() {
     let eventButton = document.getElementById('button-save');
 
-    if(eventButton.disabled){
-        document.getElementById('button-save').style.backgroundColor='#E5E5E5';
+    if (eventButton.disabled) {
+        document.getElementById('button-save').style.backgroundColor = '#E5E5E5';
         document.getElementById('button-save').style.cursor = "default";
     }
-    if(!eventButton.disabled){
-        document.getElementById('button-save').style.backgroundColor='#25C0D4';
+    if (!eventButton.disabled) {
+        document.getElementById('button-save').style.backgroundColor = '#25C0D4';
     }
 }
 
@@ -244,43 +302,43 @@ function changeBackColorFromButtonEditContactPage(){
 *  This function checks the validity of input name, e-mail and phone. If the mouse is above the button and if the validation isn't correct, 
 *  the border of the elements ltitlename, ltitleemail, ltitlephone and text "This field is required" will be white.
 */
-function validityFalseLeaveButtonWhiteBorderEditContact(){
+function validityFalseLeaveButtonWhiteBorderEditContact() {
     let statusValidationName = document.getElementById('ltitlename');
     let statusValidationEmail = document.getElementById('ltitleemail');
     let statusValidationPhone = document.getElementById('ltitlephone');
 
     changeColorFromButtonEditContactPage();
-    checkValidationByTrueBorderInvisible(statusValidationName,statusValidationEmail,statusValidationPhone);
+    checkValidationByTrueBorderInvisible(statusValidationName, statusValidationEmail, statusValidationPhone);
 }
 
 /**
  *  This function changes back the color for the create contact button on the editcontact page.
  */
-function changeColorFromButtonEditContactPage(){
+function changeColorFromButtonEditContactPage() {
     let eventButton = document.getElementById('button-save');
 
-    if(eventButton.disabled){
-        document.getElementById('button-save').style.backgroundColor='#E5E5E5';
+    if (eventButton.disabled) {
+        document.getElementById('button-save').style.backgroundColor = '#E5E5E5';
     }
-    if(!eventButton.disabled){
-        document.getElementById('button-save').style.backgroundColor='#2A3647';
+    if (!eventButton.disabled) {
+        document.getElementById('button-save').style.backgroundColor = '#2A3647';
     }
 }
 
 /**
  *  This function deletes contacts of the edit page.
  */
-function deleteContactFromEditPage(){
+function deleteContactFromEditPage() {
     document.getElementById('delete').classList.remove('d-none');
 }
 
 /**
  * This function checked is the Email available.
  */
-function isThisEmailAvailable(suppliedemail){   
+function isThisEmailAvailable(suppliedemail) {
     for (let i = 0; i < contacts.length; i++) {
-      if (contacts[i].email == suppliedemail) {
-        return true;
+        if (contacts[i].email == suppliedemail) {
+            return true;
         }
     }
     return false;

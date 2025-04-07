@@ -60,13 +60,10 @@ function closeNavbar() {
  * function gets the initials of the name of the user which is logged in
  */
 async function initialsOf() {
-  // Prüfen, ob das Element existiert
   const initialNameElement = document.getElementById("initialname");
   if (!initialNameElement) {
-    console.log("initialname element not found");
     return;
   }
-  
   const userInfo = getUserInfoFromStorage();
   displayUserInitials(userInfo);
 }
