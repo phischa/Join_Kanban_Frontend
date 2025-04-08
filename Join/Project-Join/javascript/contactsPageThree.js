@@ -20,13 +20,15 @@ function deleteContactOfContactPage() {
 }
 
 /**
- * Löscht einen Kontakt anhand seiner ID
- * @param {string|number} contactID - Kontakt-ID
- * @returns {Promise<boolean>} - Erfolgsstatus
+ * Deletes a contact by its ID
+ * Uses the user-specific delete function
+ * @param {string|number} contactID - Contact ID
+ * @returns {Promise<boolean>} - Success status
  */
 async function deleteContact(contactID) {
     try {
-        const response = await deleteContactItem(contactID);
+        // Uses the new function that checks user permissions
+        const response = await deleteUserContact(contactID);
         return await processDeleteResponse(response, contactID);
     } catch (error) {
         return handleDeleteError(error, contactID);

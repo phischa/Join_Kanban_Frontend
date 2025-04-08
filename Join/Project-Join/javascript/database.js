@@ -20,8 +20,8 @@ let actualSubtask = null;
  * Liste der öffentlich zugänglichen Seiten (ohne Authentifizierung)
  */
 const PUBLIC_PAGES = [
-    'start.html',
     'signUp.html',
+    'start.html',
     'index.html',
     'privacyRestricted.html',
     'legalRestricted.html'
@@ -33,7 +33,8 @@ const PUBLIC_PAGES = [
  */
 function isPublicPage() {
     const currentPath = window.location.pathname;
-    return PUBLIC_PAGES.some(page => currentPath.includes(page));
+    const isPublic = PUBLIC_PAGES.some(page => currentPath.includes(page));
+    return isPublic;
 }
 
 /**
@@ -73,26 +74,16 @@ function createID() {
  * This function logs in a guest user. 
  */
 function guestLogin() {
-    console.log("Logging in as guest user");
-    
-    // Authentifizierungsdaten löschen
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
-    
-    // Gast-Modus aktivieren
     localStorage.setItem('guestMode', 'true');
     
-    // Basis-Benutzerdaten für den Gast speichern
     const guestUser = {
         name: "Guest User", 
         email: "guest@example.com"
     };
     saveToLocalStorage('actualUser', guestUser);
-    
-    console.log("Guest mode activated, redirecting to summary");
-    
-    // Zur Summary-Seite weiterleiten
     window.location.href = 'summary.html';
 }
 
@@ -123,19 +114,77 @@ async function initApp() {
             window.location.href = 'start.html';
             return;
         }
+        // Prüfen, ob wir auf der Kontaktseite sind
+        const isContactPage = window.location.pathname.includes('contactsPage.html');
         
-        // Vollständige Initialisierung für authentifizierte oder Gast-Seiten
+        // Kontakte werden bereits vom contactUserManagement.js geladen, wenn wir auf der Kontaktseite sind
+        if (!isContactPage) {
+            // Nur Kontakte laden, wenn wir NICHT auf der Kontaktseite sind (vermeidet Doppelladung)
+            await loadUserContactsIfAvailable();
+        }
         await Promise.all([
-            loadContacts(),
             loadTasks(),
             loadUsers(),
             loadActualUser(),
             loadRememberMe()
         ]);
-        
-        console.log("Application fully initialized");
     } catch (error) {
         console.error("Error initializing app:", error);
+    }
+}
+
+/**
+ * Loads user contacts if the new function is available,
+ * otherwise falls back to the old method
+ */
+async function loadUserContactsIfAvailable() {
+    if (typeof loadUserContacts === 'function') {
+        try {
+            const userContacts = await loadUserContacts();
+            if (Array.isArray(userContacts)) {
+                contacts = userContacts.map(contact => ({
+                    ...contact,
+                    contactID: contact.contactID || contact.id
+                }));
+            } else {
+                console.error("Invalid contacts data from loadUserContacts");
+                loadFromLocalStorage('contacts', contacts);
+            }
+        } catch (error) {
+            console.error("Error using loadUserContacts:", error);
+            // Fallback to local storage
+            loadFromLocalStorage('contacts', contacts);
+        }
+    } else {
+        // Use old method as fallback
+        await loadContacts();
+    }
+}
+
+/**
+ * Loads all contacts from the backend (old approach)
+ * This function remains as a reference but should no longer be used.
+ * Instead use loadUserContactsOnInit() in contactsPageOne.js.
+ * @returns {Promise<void>}
+ * @deprecated
+ */
+async function loadContacts() {
+    console.warn("loadContacts is deprecated. Please use loadUserContactsOnInit() instead.");
+    try {
+        const loadedContacts = await loadAllContacts();
+
+        if (Array.isArray(loadedContacts)) {
+            contacts = loadedContacts.map(contact => ({
+                ...contact,
+                contactID: contact.contactID || contact.id
+            }));
+        } else {
+            console.error("Invalid contacts data:", loadedContacts);
+            loadFromLocalStorage('contacts', contacts);
+        }
+    } catch (error) {
+        console.error("Failed to load contacts:", error);
+        loadFromLocalStorage('contacts', contacts);
     }
 }
 
@@ -156,29 +205,6 @@ async function loadTasks() {
     } catch (error) {
         console.error("Failed to load tasks:", error);
         loadFromLocalStorage('tasks', tasks);
-    }
-}
-
-/**
- * Loads all contacts from the backend
- * @returns {Promise<void>}
- */
-async function loadContacts() {
-    try {
-        const loadedContacts = await loadAllContacts();
-
-        if (Array.isArray(loadedContacts)) {
-            contacts = loadedContacts.map(contact => ({
-                ...contact,
-                contactID: contact.contactID || contact.id
-            }));
-        } else {
-            console.error("Invalid contacts data:", loadedContacts);
-            loadFromLocalStorage('contacts', contacts);
-        }
-    } catch (error) {
-        console.error("Failed to load contacts:", error);
-        loadFromLocalStorage('contacts', contacts);
     }
 }
 

@@ -22,11 +22,9 @@ function getApiUrl(endpoint) {
 function getAuthHeaders() {
     const token = localStorage.getItem('authToken');
     const headers = { 'Content-Type': 'application/json' };
-
     if (token) {
         headers['Authorization'] = `Token ${token}`;
     }
-
     return headers;
 }
 
@@ -38,12 +36,13 @@ function isGuestMode() {
     return localStorage.getItem('guestMode') === 'true';
 }
 
-/**
- * Fetches data from a specific API endpoint
- * @param {string} endpoint - API endpoint (e.g., 'tasks', 'contacts')
- * @returns {Promise<Array>} - Array of objects from the API
- */
 async function fetchFromApi(endpoint) {
+    // Auf öffentlichen Seiten SOFORT leeres Array zurückgeben
+    if (isPublicPage()) {
+        console.log(`Public page detected, skipping API fetch for ${endpoint}`);
+        return [];
+    }
+
     // Im Gast-Modus leere Arrays zurückgeben statt API-Aufrufe
     if (isGuestMode()) {
         console.log(`Guest mode: Skipping API fetch for ${endpoint}`);
@@ -60,7 +59,10 @@ async function fetchFromApi(endpoint) {
             if (response.status === 401) {
                 // Unauthorized - token might be expired
                 console.error('Authentication error. Please log in again.');
-                logout();
+                // WICHTIG: Umleitung nur wenn wir NICHT auf einer öffentlichen Seite sind
+                if (!isPublicPage()) {
+                    logout();
+                }
                 return [];
             }
 
@@ -170,23 +172,19 @@ async function deleteResource(endpoint, id) {
         console.log(`Guest mode: Simulating delete for ${endpoint}/${id}`);
         return { status: "success" };
     }
-
     try {
         const response = await fetch(`${getApiUrl(endpoint)}${id}/`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication error. Please log in again.');
                 logout();
                 return { status: "error", message: "Authentication failed" };
             }
-
             return await handleApiError(response, `deleting ${endpoint}/${id}`);
         }
-
         return { status: "success" };
     } catch (error) {
         console.error(`Error deleting ${endpoint}/${id}:`, error);
@@ -327,16 +325,13 @@ async function registerUser(username, email, password, repeatedPassword) {
                 repeated_password: repeatedPassword
             })
         });
-
         const data = await response.json();
-
         if (!response.ok) {
             return {
                 status: "error",
                 errors: data.errors || "Registration failed"
             };
         }
-
         // Store authentication data if registration was successful
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('username', data.username);
@@ -414,7 +409,6 @@ function checkResponseStatus(response) {
 async function storeTask(task) {
     try {
         const formattedTask = formatTaskForBackend(task);
-
         let response;
         if (formattedTask.taskID) {
             response = await updateResource('tasks', formattedTask.taskID, formattedTask);
@@ -468,24 +462,38 @@ async function loadAllContacts() {
 
 /**
  * Creates or updates a contact
+ * The user is automatically derived from the auth token
  * @param {Object} contact - Contact object
  * @returns {Promise<Object>} - Response data
  */
 async function storeContact(contact) {
-    if (contact.contactID) {
-        return await updateResource('contacts', contact.contactID, contact);
-    } else {
-        return await createResource('contacts', contact);
+    try {
+        // Choose storage operation depending on whether an ID exists
+        if (contact.contactID) {
+            return await updateResource('contacts', contact.contactID, contact);
+        } else {
+            return await createResource('contacts', contact);
+        }
+    } catch (error) {
+        console.error("Error in storeContact:", error);
+        return { status: "error", message: error.message };
     }
 }
 
 /**
  * Deletes a contact by ID
+ * Checks if the current user is authorized
  * @param {string|number} contactId - Contact ID
  * @returns {Promise<Object>} - Response status
  */
 async function deleteContactItem(contactId) {
-    return await deleteResource('contacts', contactId);
+    try {
+        // The backend checks if the contact belongs to the authenticated user
+        return await deleteResource('contacts', contactId);
+    } catch (error) {
+        console.error("Error in deleteContactItem:", error);
+        return { status: "error", message: error.message };
+    }
 }
 
 /**
@@ -643,18 +651,21 @@ function isAuthenticated() {
  * Logs out the current user
  */
 function logout() {
+    // Wenn wir auf einer öffentlichen Seite sind, nicht umleiten
+    const isPublic = isPublicPage();
+    console.log("Logout called on public page:", isPublic);
+    
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
     removeFromLocalStorage('actualUser');
-
-    // Keep remember me settings if desired
     if (!localStorage.getItem('rememberMe')) {
         localStorage.removeItem('rememberedEmail');
         localStorage.removeItem('rememberedPassword');
     }
-
-    window.location.href = 'start.html';
+    if (!isPublic) {
+        window.location.href = 'start.html';
+    }
 }
 
 // Ensure a default user exists in the system

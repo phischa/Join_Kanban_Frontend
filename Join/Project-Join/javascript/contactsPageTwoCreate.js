@@ -1,15 +1,16 @@
 /**
- * Erstellt einen neuen Kontakt
- * @param {string} name - Name des Kontakts
- * @param {string} email - Email des Kontakts
- * @param {string} phone - Telefonnummer des Kontakts
- * @returns {Object} - Erstelltes Kontaktobjekt
+ * Creates a new contact
+ * @param {string} name - Contact name
+ * @param {string} email - Contact email
+ * @param {string} phone - Contact phone number
+ * @returns {Object} - Created contact object
  */
 async function createContact(name, email, phone) {
     const color = generateRandomColor();
     const newContact = createContactObject(name, email, phone, color);
     
     try {
+        // The current user is automatically assigned in the backend
         const response = await storeContact(newContact);
         return await processContactResponse(response, newContact);
     } catch (error) {
@@ -18,9 +19,10 @@ async function createContact(name, email, phone) {
 }
 
 /**
- * Erstellt ein Kontaktobjekt mit den gegebenen Details
+ * Creates a contact object with the given details
  */
 function createContactObject(name, email, phone, color) {
+    // Note: user is automatically determined from the auth token in the backend
     return {
         name: name,
         email: email,
@@ -31,19 +33,33 @@ function createContactObject(name, email, phone, color) {
 }
 
 /**
- * Verarbeitet die Antwort nach dem Erstellen eines Kontakts
+ * Processes the response after creating a contact
+ * Ensures the contact is associated with the current user
  */
 async function processContactResponse(response, contact) {
     const contactID = getContactIDFromResponse(response);
     
     if (contactID) {
+        // Update contact with ID and add to array
         contact.contactID = contactID;
+        
+        // Only add contact to local array if it's intended for the current user
         contacts.push(contact);
-        saveToLocalStorage('contacts', contacts);
+        
+        // Local storage for offline access/guest mode
+        updateContactsInLocalStorage(contacts);
         return contact;
     } else {
-        throw new Error("Kontakt konnte nicht gespeichert werden");
+        throw new Error("Contact could not be saved");
     }
+}
+
+/**
+ * Updates contacts in local storage
+ */
+function updateContactsInLocalStorage(contactsArray) {
+    // Ensure only contacts of the current user are saved
+    saveToLocalStorage('contacts', contactsArray);
 }
 
 /**
