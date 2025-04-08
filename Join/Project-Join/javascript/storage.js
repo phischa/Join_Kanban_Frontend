@@ -37,15 +37,11 @@ function isGuestMode() {
 }
 
 async function fetchFromApi(endpoint) {
-    // Auf öffentlichen Seiten SOFORT leeres Array zurückgeben
     if (isPublicPage()) {
         console.log(`Public page detected, skipping API fetch for ${endpoint}`);
         return [];
     }
-
-    // Im Gast-Modus leere Arrays zurückgeben statt API-Aufrufe
     if (isGuestMode()) {
-        console.log(`Guest mode: Skipping API fetch for ${endpoint}`);
         return [];
     }
 
