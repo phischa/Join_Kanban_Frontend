@@ -44,7 +44,6 @@ async function fetchFromApi(endpoint) {
     if (isGuestMode()) {
         return [];
     }
-
     try {
         console.log(`Fetching data from ${endpoint}...`);
         const response = await fetch(getApiUrl(endpoint), {
@@ -61,11 +60,9 @@ async function fetchFromApi(endpoint) {
                 }
                 return [];
             }
-
             console.error(`Error fetching from ${endpoint}: ${response.status}`);
             return [];
         }
-
         return await response.json();
     } catch (error) {
         console.error(`Error in fetchFromApi(${endpoint}):`, error);
@@ -89,10 +86,8 @@ async function createResource(endpoint, data) {
             // Weitere Felder je nach Bedarf
         };
     }
-
     try {
         console.log(`Creating resource at ${endpoint}:`, data);
-
         const response = await fetch(getApiUrl(endpoint), {
             method: 'POST',
             headers: getAuthHeaders(),
