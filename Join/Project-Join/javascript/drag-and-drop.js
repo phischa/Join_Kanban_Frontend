@@ -87,7 +87,7 @@ function showDropZone(columnId, atAll, visible){
         blurCard(columnId)
     }
     if (!visible){
-     showNoCard(true);
+        showNoCard(true);
     } else if(visible){
         showNoCard(false);
     }
@@ -158,33 +158,46 @@ function startDragFrom(columnId, id, atAllboolean = false){
 }
 
 
-/** will happen by drop a card in a Drop-Zone. It will move to this column.
-* @param {number} category - a number to switch the column
-*/
-async function moveTo(category){
-    // Get the task ID from the current drag operation
-    const taskId = list[currenOnDrag[0]][currenOnDrag[1]]["taskID"];
-    
-    // Update the currentProgress in the local task object
-    list[currenOnDrag[0]][currenOnDrag[1]]["currentProgress"] = category;
-    
+/**
+ * Updates a task's progress in memory
+ * @param {string} taskId - ID of the task to update
+ * @param {number} newProgress - New progress/category value
+ * @returns {Object|null} - Updated task object or null if not found
+ */
+function updateTaskProgress(taskId, newProgress) {
+    const taskIndex = taskObjects.findIndex(t => t.taskID == taskId);
+    if (taskIndex !== -1) {
+        taskObjects[taskIndex].currentProgress = newProgress;
+        return taskObjects[taskIndex];
+    }
+    return null;
+}
+
+/**
+ * Saves a task to the backend and refreshes the board
+ * @param {Object} task - Task object to save
+ * @returns {Promise<void>}
+ */
+async function saveTaskAndRefresh(task) {
     try {
-        // Find the task in taskObjects to ensure the main array is also updated
-        const taskIndex = taskObjects.findIndex(task => task.taskID == taskId);
-        if (taskIndex !== -1) {
-            taskObjects[taskIndex].currentProgress = category;
-        }
-        
-        // Save the task to backend using our updated functions
-        await saveCurrentTask(currenOnDrag[0], currenOnDrag[1], false);
-        
-        // Refresh the board view
+        await storeTask(task);
         refreshColumnRender();
     } catch (error) {
-        console.error("Error updating task position:", error);
-        // Fallback to local storage if API fails
-        localStorage.setItem('tasks', JSON.stringify(taskObjects));
+        console.error("Error saving task:", error);
         refreshColumnRender();
+    }
+}
+
+/**
+ * Will happen when dropping a card in a Drop-Zone. It will move to this column.
+ * @param {number} category - a number to switch the column
+ */
+async function moveTo(category) {
+    const taskId = list[currenOnDrag[0]][currenOnDrag[1]]["taskID"];
+    list[currenOnDrag[0]][currenOnDrag[1]]["currentProgress"] = category;
+    const updatedTask = updateTaskProgress(taskId, category);
+    if (updatedTask) {
+        await saveTaskAndRefresh(updatedTask);
     }
 }
 
@@ -193,7 +206,7 @@ async function moveTo(category){
 * @param {boolean} atAllboolean - set it on to affect all Task.
 */
 function endDrag(columnId, atAllboolean){
-   showDropZone(columnId, atAllboolean, false);
+    showDropZone(columnId, atAllboolean, false);
 }
 
 
@@ -205,22 +218,12 @@ function endDrag(columnId, atAllboolean){
  */
 async function updateTaskColumn(taskId, newColumn) {
     try {
-        // Find the task in our global array
         const task = taskObjects.find(task => task.taskID == taskId);
-        
         if (!task) {
             console.error(`Task with ID ${taskId} not found`);
             return;
         }
-        
-        // Update the progress value
         task.currentProgress = newColumn;
-        
-        // Set as current task and save using our API functions
-        setAsActualTask(taskId);
-        await saveActualTask();
-        
-        // Refresh the board view
         refreshColumnRender();
     } catch (error) {
         console.error("Error updating task column:", error);

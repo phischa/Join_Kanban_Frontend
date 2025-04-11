@@ -48,10 +48,8 @@ async function saveCurrentTask(columnId = 0, id = 0, orWithID = false) {
     } else {
         pullTask = orWithID;
     }
-    setAsActualTask(pullTask);
     actualizeSubtasks(columnId, id);
     editActucalTask(columnId, id);
-    await saveActualTask();
 }
 
 /**
