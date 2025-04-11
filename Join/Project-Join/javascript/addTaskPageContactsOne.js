@@ -312,16 +312,13 @@ function checkForImageFilter(element){
 function getFilterOptionRowHTML(i, checkIMG) {
   return ` 
     
-     <label class="optionRow" for="one" id="label${filteredContacts[i].contactID}" onclick="addToRemoveFromTask('${filteredContacts[i].contactID}')">
-         <canvas class="dropdownMenuCanvas" width="48" height="48" id="${filteredContacts[i].contactID}"></canvas>
-         <div class="boxNameAndSelect">
-             ${filteredContacts[i].name}
-             <img src="../img/icons/${checkIMG}" id="four" />
-         </div>
-     </label>
- 
- 
- `;
+    <label class="optionRow" for="one" id="label${filteredContacts[i].contactID}" onclick="addToRemoveFromTask('${filteredContacts[i].contactID}')">
+        <canvas class="dropdownMenuCanvas" width="48" height="48" id="${filteredContacts[i].contactID}"></canvas>
+        <div class="boxNameAndSelect">
+            ${filteredContacts[i].name}
+            <img src="../img/icons/${checkIMG}" id="four" />
+        </div>
+    </label>`;
 }
 
 

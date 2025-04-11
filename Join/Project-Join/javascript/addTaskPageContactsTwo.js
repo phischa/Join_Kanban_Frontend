@@ -100,7 +100,7 @@ function renderAssignedToMenu() {
   renderCanvasesInAssignedToRenderArea();
 }
 
-function checkForImage(element){
+function checkForImage(element) {
   element.innerHTML = "";
   let checkIMG = "";
   for (let i = 0; i < contactsOfAddPage.length; i++) {
@@ -122,17 +122,14 @@ function checkForImage(element){
 function getOptionRowHTML(i, checkIMG) {
   return ` 
     
-     <label class="optionRow" for="one" id="label${contactsOfAddPage[i].contactID}" 
-     onclick="addToRemoveFromTask('${contactsOfAddPage[i].contactID}')">
-         <canvas class="dropdownMenuCanvas" width="48" height="48" id="${contactsOfAddPage[i].contactID}"></canvas>
-         <div class="boxNameAndSelect">
-             ${contactsOfAddPage[i].name}
-             <img src="../img/icons/${checkIMG}" id="four" />
-         </div>
-     </label>
- 
- 
- `;
+    <label class="optionRow" for="one" id="label${contactsOfAddPage[i].contactID}" 
+    onclick="addToRemoveFromTask('${contactsOfAddPage[i].contactID}')">
+        <canvas class="dropdownMenuCanvas" width="48" height="48" id="${contactsOfAddPage[i].contactID}"></canvas>
+        <div class="boxNameAndSelect">
+            ${contactsOfAddPage[i].name}
+            <img src="../img/icons/${checkIMG}" id="four" />
+        </div>
+    </label>`;
 }
 
 /**
@@ -143,7 +140,7 @@ function getOptionRowHTML(i, checkIMG) {
 function noContactHTML() {
   return `
   <div id="noContactText">
-     No contacts found for this search parameter.
+    No contacts found for this search parameter.
   </div>
   `;
 }

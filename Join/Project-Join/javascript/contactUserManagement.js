@@ -51,12 +51,8 @@ function checkUserBeforeContactOperation() {
  */
 function activateGuestModeWithWarning() {
     console.warn("Activating guest mode for contacts. Changes won't be saved to server.");
-    
-    // Activate guest mode if not already active
     if (localStorage.getItem('guestMode') !== 'true') {
         localStorage.setItem('guestMode', 'true');
-        
-        // Optional: Show warning
         alert("You are not logged in. Changes will only be saved locally.");
     }
 }
@@ -74,7 +70,6 @@ async function loadUserContacts() {
     if (!checkContactAuthentication()) {
         return [];
     }
-    
     try {
         if (isGuestMode()) {
             return loadGuestContacts();
@@ -118,7 +113,6 @@ function loadContactsFromLocalStorage() {
  * Loads contacts in guest mode
  */
 function loadGuestContacts() {
-    console.log("Loading contacts in guest mode");
     return loadContactsFromLocalStorage();
 }
 
@@ -301,7 +295,6 @@ async function validateUserSession() {
 function resetContactState() {
     contacts = [];
     sortedContactsByName = [];
-    console.log("Contact state reset");
 }
 
 /**
@@ -321,7 +314,6 @@ function setContactsLoadingState(isLoading) {
  */
 function showContactLoadError() {
     console.error("Could not load contacts. Check your connection.");
-    // Optional: Show UI element for error message
 }
 
 /**
@@ -329,12 +321,9 @@ function showContactLoadError() {
  */
 function handleContactInitError(error) {
     console.error("Contact initialization error:", error);
-    
-    // Show error message and fallback to local storage
     if (!isPublicPage()) {
         try {
             loadFromLocalStorage('contacts', contacts);
-            console.log("Loaded contacts from local storage as fallback");
         } catch (fallbackError) {
             console.error("Even local storage fallback failed:", fallbackError);
         }
@@ -350,18 +339,11 @@ function handleContactInitError(error) {
  * Only initialize contacts if we're on the contacts page
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize contacts only on contact pages to avoid duplicate loading
     if (window.location.pathname.includes('contactsPage.html')) {
-        console.log("Contact page detected, initializing contacts system");
-        
-        // Check if contacts have already been loaded by database.js
         if (contacts && contacts.length > 0) {
-            console.log("Contacts already loaded by database.js, skipping initialization");
             return;
         }
-        
         initializeContacts().then(() => {
-            console.log("Contacts initialized");
         });
     }
 });

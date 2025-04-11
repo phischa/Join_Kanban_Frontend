@@ -268,7 +268,6 @@ async function saveTaskAndRedirect(taskData) {
     );
     
     const response = await storeTask(newTask);
-    
     if (response.status === "success") {
       cleanupTaskForm();
       setTimeout(goToBoard, 500);

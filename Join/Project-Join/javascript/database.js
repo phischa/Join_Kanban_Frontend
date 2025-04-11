@@ -200,7 +200,12 @@ async function loadTasks() {
             tasks = loadedTasks;
         } else {
             console.error("Invalid tasks data:", loadedTasks);
-            loadFromLocalStorage('tasks', tasks);
+            // Only use localStorage fallback in guest mode
+            if (isGuestMode()) {
+                loadFromLocalStorage('tasks', tasks);
+            } else {
+                tasks = [];
+            }
         }
     } catch (error) {
         console.error("Failed to load tasks:", error);

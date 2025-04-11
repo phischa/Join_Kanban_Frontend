@@ -29,39 +29,30 @@ function getAuthHeaders() {
 }
 
 /**
- * Überprüft, ob der Gast-Modus aktiv ist
- * @returns {boolean} True wenn im Gast-Modus
+ * Test, if guest mode in active
+ * @returns {boolean} Returns true if guest mode
  */
 function isGuestMode() {
     return localStorage.getItem('guestMode') === 'true';
 }
 
+/**
+ * Fetches data from the specified API endpoint.
+ * Returns an empty array if on a public page or in guest mode.
+ * 
+ * @param {string} endpoint - The API endpoint to fetch from
+ * @returns {Promise<Array|Object>} The JSON response data or an empty array if an error occurs
+ */
 async function fetchFromApi(endpoint) {
-    if (isPublicPage()) {
-        console.log(`Public page detected, skipping API fetch for ${endpoint}`);
-        return [];
-    }
-    if (isGuestMode()) {
+    if (isPublicPage() || isGuestMode()) { 
         return [];
     }
     try {
-        console.log(`Fetching data from ${endpoint}...`);
         const response = await fetch(getApiUrl(endpoint), {
             headers: getAuthHeaders()
         });
-
         if (!response.ok) {
-            if (response.status === 401) {
-                // Unauthorized - token might be expired
-                console.error('Authentication error. Please log in again.');
-                // WICHTIG: Umleitung nur wenn wir NICHT auf einer öffentlichen Seite sind
-                if (!isPublicPage()) {
-                    logout();
-                }
-                return [];
-            }
-            console.error(`Error fetching from ${endpoint}: ${response.status}`);
-            return [];
+            return handleFetchError(response, endpoint);
         }
         return await response.json();
     } catch (error) {
@@ -71,20 +62,35 @@ async function fetchFromApi(endpoint) {
 }
 
 /**
+ * Handles error responses from API fetch requests.
+ * Special handling for 401 authentication errors with logout functionality.
+ * 
+ * @param {Response} response - The fetch Response object
+ * @param {string} endpoint - The API endpoint that was requested
+ * @returns {Array} An empty array
+ */
+function handleFetchError(response, endpoint) {
+    if (response.status === 401) {
+        console.error('Authentication error. Please log in again.');
+        if (!isPublicPage()) {
+            logout();
+        }
+        return [];
+    }
+    console.error(`Error fetching from ${endpoint}: ${response.status}`);
+    return [];
+}
+
+/**
  * Creates a new resource via the API
  * @param {string} endpoint - API endpoint
  * @param {Object|Array} data - Data to send
  * @returns {Promise<Object>} - Response data
  */
 async function createResource(endpoint, data) {
-    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
     if (isGuestMode()) {
         console.log(`Guest mode: Simulating create for ${endpoint}`);
-        return {
-            status: "success",
-            id: createID(), // Lokale ID generieren
-            // Weitere Felder je nach Bedarf
-        };
+        simulateGuestTaskSave();
     }
     try {
         console.log(`Creating resource at ${endpoint}:`, data);
@@ -93,17 +99,14 @@ async function createResource(endpoint, data) {
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         });
-
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Authentication error. Please log in again.');
                 logout();
                 return { status: "error", message: "Authentication failed" };
             }
-
             return await handleApiError(response, `creating resource at ${endpoint}`);
         }
-
         return await response.json();
     } catch (error) {
         console.error(`Error creating resource at ${endpoint}:`, error);
@@ -323,11 +326,10 @@ async function registerUser(username, email, password, repeatedPassword) {
                 errors: data.errors || "Registration failed"
             };
         }
-        // Store authentication data if registration was successful
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('username', data.username);
         localStorage.setItem('email', data.email);
-
+        
         return {
             status: "success",
             user: {
@@ -342,12 +344,69 @@ async function registerUser(username, email, password, repeatedPassword) {
     }
 }
 
-// Task-specific API functions
 /**
- * Loads all tasks from the API
+ * Simulates saving a task in guest mode
+ * @param {Object} task - Task to save
+ * @returns {Object} - Response with simulated taskID
+ */
+function simulateGuestTaskSave(task) {
+    const tempId = createID();
+    task.taskID = tempId;
+    
+    const localTasks = getFromLocalStorage('tasks') || [];
+    localTasks.push(task);
+    saveToLocalStorage('tasks', localTasks);
+    
+    return {
+        status: "success",
+        taskID: tempId,
+        message: "Task saved in guest mode"
+    };
+}
+
+/**
+ * Simulates updating a task in guest mode
+ * @param {Object} task - Task to update
+ * @returns {Object} - Success response
+ */
+function simulateGuestTaskUpdate(task) {
+    const localTasks = getFromLocalStorage('tasks') || [];
+    const index = localTasks.findIndex(t => t.taskID === task.taskID);
+    
+    if (index !== -1) {
+        localTasks[index] = task;
+        saveToLocalStorage('tasks', localTasks);
+        return { status: "success", message: "Task updated in guest mode" };
+    } else {
+        return simulateGuestTaskSave(task);
+    }
+}
+
+/**
+ * Simulates deleting a task in guest mode
+ * @param {string|number} taskId - Task ID to delete
+ * @returns {Object} - Success response
+ */
+function simulateGuestTaskDelete(taskId) {
+    const localTasks = getFromLocalStorage('tasks') || [];
+    const filteredTasks = localTasks.filter(t => t.taskID !== taskId);
+    
+    saveToLocalStorage('tasks', filteredTasks);
+    
+    return {
+        status: "success",
+        message: "Task deleted in guest mode"
+    };
+}
+
+/**
+ * Updates the loadAllTasks function to handle guest mode
  * @returns {Promise<Array>} - Array of task objects
  */
 async function loadAllTasks() {
+    if (isGuestMode()) {
+        return getFromLocalStorage('tasks') || [];
+    }
     return await fetchFromApi('tasks');
 }
 
@@ -393,20 +452,43 @@ function checkResponseStatus(response) {
 }
 
 /**
- * Stores a task in the backend with improved error handling
+ * Handles task storage in guest mode
+ * @param {Object} task - Task to store
+ * @returns {Object} - Storage response
+ */
+function handleGuestModeTaskStorage(task) {
+    if (task.taskID) {
+        return simulateGuestTaskUpdate(task);
+    }
+    return simulateGuestTaskSave(task);
+}
+
+/**
+ * Handles task storage via API
+ * @param {Object} task - Task to store
+ * @returns {Promise<Object>} - API response
+ */
+async function handleApiTaskStorage(task) {
+    const formattedTask = formatTaskForBackend(task);
+    
+    if (formattedTask.taskID) {
+        return await updateResource('tasks', formattedTask.taskID, formattedTask);
+    }
+    return await createResource('tasks', formattedTask);
+}
+
+/**
+ * Stores a task with guest mode support
  * @param {Object} task - Task object to store
- * @returns {Promise<Object>} - Backend response
+ * @returns {Promise<Object>} - Response
  */
 async function storeTask(task) {
     try {
-        const formattedTask = formatTaskForBackend(task);
-        let response;
-        if (formattedTask.taskID) {
-            response = await updateResource('tasks', formattedTask.taskID, formattedTask);
-        } else {
-            response = await createResource('tasks', formattedTask);
+        if (isGuestMode()) {
+            return handleGuestModeTaskStorage(task);
         }
-
+        
+        const response = await handleApiTaskStorage(task);
         return checkResponseStatus(response);
     } catch (error) {
         console.error("Error saving task:", error);
@@ -415,30 +497,14 @@ async function storeTask(task) {
 }
 
 /**
- * Speichert alle Tasks in der Datenbank
- * @returns {Promise<Object>} Ergebnis des Speicherns
- */
-async function storeTasks() {
-    try {
-        // Jeder Task wird einzeln gespeichert
-        const savingPromises = tasks.map(task => storeTask(task));
-        await Promise.all(savingPromises);
-        return { status: "success" };
-    } catch (error) {
-        console.error("Error storing tasks:", error);
-        return {
-            status: "error",
-            message: "Failed to store all tasks: " + error.message
-        };
-    }
-}
-
-/**
- * Deletes a task by ID
+ * Deletes a task by ID with guest mode support
  * @param {string|number} taskId - Task ID
  * @returns {Promise<Object>} - Response status
  */
 async function deleteTaskItem(taskId) {
+    if (isGuestMode()) {
+        return simulateGuestTaskDelete(taskId);
+    }
     return await deleteResource('tasks', taskId);
 }
 
@@ -488,6 +554,54 @@ async function deleteContactItem(contactId) {
 }
 
 /**
+ * Updates create resource function for tasks
+ */
+function updateCreateResourceFunction() {
+    const originalCreateResource = createResource;
+    createResource = async function(endpoint, data) {
+        if (isGuestMode() && endpoint === 'tasks') {
+            return simulateGuestTaskSave(data);
+        }
+        return originalCreateResource(endpoint, data);
+    };
+}
+
+/**
+ * Updates update resource function for tasks
+ */
+function updateUpdateResourceFunction() {
+    const originalUpdateResource = updateResource;
+    updateResource = async function(endpoint, id, data) {
+        if (isGuestMode() && endpoint === 'tasks') {
+            return simulateGuestTaskUpdate(data);
+        }
+        return originalUpdateResource(endpoint, id, data);
+    };
+}
+
+/**
+ * Updates delete resource function for tasks
+ */
+function updateDeleteResourceFunction() {
+    const originalDeleteResource = deleteResource;
+    deleteResource = async function(endpoint, id) {
+        if (isGuestMode() && endpoint === 'tasks') {
+            return simulateGuestTaskDelete(id);
+        }
+        return originalDeleteResource(endpoint, id);
+    };
+}
+
+/**
+ * Updates resource functions to use task guest mode
+ */
+function updateResourceFunctions() {
+    updateCreateResourceFunction();
+    updateUpdateResourceFunction();
+    updateDeleteResourceFunction();
+}
+
+/**
  * Loads all users from the API
  * @returns {Promise<Array>} - Array of user objects
  */
@@ -524,8 +638,6 @@ async function deleteUserItem(userId) {
  */
 function formatTaskForBackend(task) {
     const formatted = { ...task };
-
-    // Format assignedTo for the backend
     if (formatted.assignedTo && Array.isArray(formatted.assignedTo)) {
         formatted.assignedTo = formatted.assignedTo.map(contact => {
             if (typeof contact === 'object') {
@@ -539,24 +651,18 @@ function formatTaskForBackend(task) {
             return { contactID: contact };
         });
     }
-
-    // Format subtasks for the backend
     if (formatted.subtasks && Array.isArray(formatted.subtasks)) {
         formatted.subtasks = formatted.subtasks.map(subtask => ({
             subTaskName: subtask.subTaskName || subtask.name || "",
             done: Boolean(subtask.done)
         }));
     }
-
-    // Ensure valid values for priority and category
     if (formatted.priority && !["low", "medium", "urgent"].includes(formatted.priority)) {
         formatted.priority = "medium";
     }
-
     if (formatted.category && !["todo", "inprogress", "done"].includes(formatted.category)) {
         formatted.category = "todo";
     }
-
     return formatted;
 }
 
@@ -665,16 +771,17 @@ async function ensureDefaultUserExists() {
     // But keeping it for backward compatibility
     try {
         const users = await loadAllUsers();
-
         if (!users || users.length === 0) {
             console.log("No users found in the system.");
         }
-
         return users;
     } catch (error) {
         console.error("Error checking users:", error);
         return [];
     }
 }
+
+// Initialize resource functions
+updateResourceFunctions();
 
 //------------------end of storage---------------------------------------------------------------------------
