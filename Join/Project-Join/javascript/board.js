@@ -84,26 +84,19 @@ async function baordLoadTasks() {
     try {
         // Get tasks from API using our updated loadAllTasks function
         const loadedTasks = await loadAllTasks();
-        
         if (Array.isArray(loadedTasks)) {
             taskObjects = [...loadedTasks];
         } else {
             console.error("Invalid response format from loadAllTasks");
-            // Fallback to localStorage
-            loadTasksFromLocalStorage();
         }
-        
         // Ensure each task has an assignedTo array
         taskObjects.forEach(task => {
             if (!task.assignedTo || !Array.isArray(task.assignedTo)) {
                 task.assignedTo = [];
             }
-        });
-        
+        }); 
     } catch (error) {
         console.error("Error loading tasks:", error);
-        // Fallback to localStorage
-        loadTasksFromLocalStorage();
     }
 }
 

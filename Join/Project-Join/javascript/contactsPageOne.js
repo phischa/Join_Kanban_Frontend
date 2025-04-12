@@ -4,20 +4,14 @@ let sortedContactsByName, resetBgColor = 0, lastIndex, editIndex;
  *  Loads functions that are needed upfront.
  */
 async function onload() {
-    // Loads only contacts of the currently logged in user
     try {
-        // Check if new function is available
         if (typeof loadUserContactsOnInit === 'function') {
             await loadUserContactsOnInit();
         } else {
-            // Fallback to old method if new function isn't available
             await loadContacts();
         }
-        console.log("Loaded contacts:", contacts);
         renderContactList();
     } catch (error) {
-        console.error("Error during contact loading:", error);
-        // Try fallback
         await loadContacts();
         renderContactList();
     }
@@ -31,23 +25,18 @@ async function loadUserContactsOnInit() {
         // Check if the new function is available
         if (typeof loadUserContacts === 'function') {
             const userContacts = await loadUserContacts();
-            
             if (Array.isArray(userContacts)) {
                 contacts = userContacts.map(contact => ({
                     ...contact,
                     contactID: contact.contactID || contact.id
                 }));
             } else {
-                console.error("Invalid contacts data");
                 loadFromLocalStorage('contacts', contacts);
             }
         } else {
-            // Fallback to old contact loading method
-            console.warn("loadUserContacts not found, using fallback");
             await loadContacts();
         }
     } catch (error) {
-        console.error("Failed to load user contacts:", error);
         loadFromLocalStorage('contacts', contacts);
     }
 }

@@ -169,7 +169,6 @@ async function loadUserContactsIfAvailable() {
  * @deprecated
  */
 async function loadContacts() {
-    console.warn("loadContacts is deprecated. Please use loadUserContactsOnInit() instead.");
     try {
         const loadedContacts = await loadAllContacts();
 
