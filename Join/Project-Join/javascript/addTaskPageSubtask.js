@@ -199,14 +199,13 @@ function prepareSubtasksForBackend() {
       done: false
     });
   }
-  
   return formattedSubtasks;
 }
 
 /**
  * Finalizes subtasks with correct format
  */
-function finalizeSubtasks() {
+async function finalizeSubtasks() {
   finalSubtasksOfAddPage = prepareSubtasksForBackend();
 }
 

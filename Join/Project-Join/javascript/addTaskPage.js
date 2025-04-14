@@ -8,7 +8,7 @@ async function onload() {
   setMinDate();
   loadTasks();
   loadUsers();
-  await loadContacts();
+  await loadUserContactsIfAvailable();
   //await loadActualUser();
   //await initialsOf();
   /* pressMediumButton(); */

@@ -217,7 +217,7 @@ function refreshColumnRender() {
     initDropZone();
     showDropZone(0, true, false);
 }
-
+1
 /**
 * value - returns a {number} in percent of the current progress of finished/unfinished Subtasks.
 */

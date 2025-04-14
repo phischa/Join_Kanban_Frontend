@@ -21,7 +21,7 @@ async function addTaskInBoardInit(setColumn = 0){
     setMinDate();
     loadTasks();
     loadUsers();
-    await loadContacts();
+    await loadUserContactsOnInit();
     //await loadActualUser();
     CheckforUnclosedWindows();
     checkRequirementsMouseover();

@@ -8,7 +8,7 @@ function renderCanvases() {
     let canvas = canvases[i];
     id = canvas.id;
 
-    let contact = getContactFromID(id);
+    let contact = getContactIDFromResponse(id);
 
     drawColoredCircle(contact.color, contact.initials, id);
   }
@@ -26,7 +26,7 @@ function renderCanvasesInAssignedToRenderArea() {
     id = canvas.id;
     if (canvas.id != "moreContacts") {
       let contactId = id.slice(1);
-      let contact = getContactFromID(contactId);
+      let contact = getContactIDFromResponse(contactId);
       drawColoredCircle(contact.color, contact.initials, id);
     } else {
       renderMoreContacts();

@@ -116,11 +116,6 @@ function generateListOfSubtask(columnNumber, id){
 * @param {boolean} isForCard - is needet to render it right for card or lightbox.
 * @param {number} maxCounter - set a max-amount of rendering icons in your element to prevent overvlow.
 */
-/**
-* generateAssignedTo() generates small Icons of any User which in involved inside the current task.
-* @param {boolean} isForCard - is needet to render it right for card or lightbox.
-* @param {number} maxCounter - set a max-amount of rendering icons in your element to prevent overvlow.
-*/
 function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5){
     // Safely check if assignedTo exists and is an array
     let assignedTo = list[columnNumber][id]["assignedTo"] || [];
@@ -145,15 +140,14 @@ function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5){
             currentHTMLCode = `<li><div style="background-color: ${assignedTo[i]["color"] || "#6e6ee5"}" class="circle">${assignedTo[i]["initials"] || "??"}</div><p>${assignedTo[i]["name"] || "Unknown"}</p></li>`;
         }
         HTMLCode += currentHTMLCode;
-    }
-    
+    } 
     return HTMLCode;
 }
 
 
 /**
 * generateTeaserText() is able to trim after specific amount of characters (maxLength) but it will never cut a word. So it cause a offest of a max-length.
-* @param {sting} taskDescription - the raw text, which you want to trim.
+* @param {string} taskDescription - the raw text, which you want to trim.
 * @param {number} maxLength - the max-length which you want to receive.
 */
 function generateTeaserText(taskDescription, maxLength = 32){
@@ -189,7 +183,7 @@ function checkForMaxLength(text, maxLength = 32){
 
 /**
 * Just checks the input - is the input already a text or need to looking for task-description.
-* @param {sring} text - just raw text.
+* @param {string} text - just raw text.
 */
 function receivedTaskOrText(text, columnNumber, id){
     let inputText = "";
