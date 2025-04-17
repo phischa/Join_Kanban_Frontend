@@ -49,15 +49,17 @@ function renderAddTaskTemplateLightBox(){
 function collectBoardTaskData() {
   const title = document.getElementById("ltitlename").value;
   const description = document.getElementById("ldescriptionname").value;
-  const assigned = assignedContacts;
+  const assignedTo = assignedContacts.map(contact => ({
+    contactID: contact.contactID
+  }));
   const date = document.getElementById("ldatename").value;
-  const prio = priority;
+  const prio = priority === 'none' ? 'medium' : priority;
   const category = document.getElementById("lcategoryname").value;
   
   finalizeSubtasks();
   const subtasks = finalSubtasksOfAddPage;
   
-  return { title, description, assigned, date, prio, category, subtasks };
+  return { title, description, assignedTo, date, prio, category, subtasks };
 }
 
 /**

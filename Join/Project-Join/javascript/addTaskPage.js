@@ -36,18 +36,18 @@ function setMinDate() {
  * checks if the form requirements are fullfilled every time the duetate is changed
  * 
 */
-function checkRequirementsDuetate(){
+function checkRequirementsDuetate() {
   document
-  .getElementById("ldatename")
-  .addEventListener("change", function (event) {
-    checkCreateTask();
-  });
+    .getElementById("ldatename")
+    .addEventListener("change", function (event) {
+      checkCreateTask();
+    });
 }
 
 /**
  * marks the missing required fields red when mouse hovers over createTaskButton
 */
-function checkRequirementsMouseover(){
+function checkRequirementsMouseover() {
   document
     .getElementById("createTaskButton")
     .addEventListener("mouseover", function (event) {
@@ -69,7 +69,7 @@ function checkRequirementsMouseover(){
 /**
  * unmarks the missing required fields when mouse leaves createTaskButton
 */
-function CheckMouseoutCreateTask(){
+function CheckMouseoutCreateTask() {
   document
     .getElementById("createTaskButton")
     .addEventListener("mouseout", function (event) {
@@ -80,13 +80,13 @@ function CheckMouseoutCreateTask(){
       requiredCategoryNorm();
 
       if (text.style.border == "2px solid red") {
-       text.style.border = "";
+        text.style.border = "";
       }
-  });
+    });
 }
-  /**
-   * marks title red if unfilled
-   */
+/**
+ * marks title red if unfilled
+ */
 function requiredTitle() {
   let title = document.getElementById("ltitlename");
 
@@ -154,7 +154,7 @@ function requiredCategoryNorm() {
 /*
  * checks for a menu that is already open.
 */
-function CheckforUnclosedWindows(){
+function CheckforUnclosedWindows() {
   document.addEventListener("click", unclosedWindowsEvent);
   document.addEventListener("keyup", alreadyCheckeCreateTask);
 }
@@ -162,7 +162,7 @@ function CheckforUnclosedWindows(){
 /*
  * closes open select menues when a click outside of the menus occurs
 */
-function unclosedWindowsEvent(event){
+function unclosedWindowsEvent(event) {
   let targetElement = event.target;
   renderAssignedToRenderArea();
   checkCreateTask();
@@ -171,12 +171,12 @@ function unclosedWindowsEvent(event){
   checkSubtaskEventArea(targetElement);
 }
 
-  //-------Funktionen zum Disablen des createTaskButtons
-  // after every letting a key go it is checked whether the createTaskButton needs to be disbaled
+//-------Funktionen zum Disablen des createTaskButtons
+// after every letting a key go it is checked whether the createTaskButton needs to be disbaled
 
-  function alreadyCheckeCreateTask(event){
-    checkCreateTask();
-  }
+function alreadyCheckeCreateTask(event) {
+  checkCreateTask();
+}
 
 /**
  * disabled or enables the createTaskButton depending on the inputstate of the required fields
@@ -223,15 +223,17 @@ function clearForm() {
 function collectTaskData() {
   const title = document.getElementById("ltitlename").value;
   const description = document.getElementById("ldescriptionname").value;
-  const assigned = assignedContacts;
+  const assignedTo = assignedContacts.map(contact => ({
+    contactID: contact.contactID
+  }));
   const date = document.getElementById("ldatename").value;
-  const prio = priority;
+  const prio = priority === 'none' ? 'medium' : priority;
   const category = document.getElementById("lcategoryname").value;
-  
+
   finalizeSubtasks();
   const subtasks = finalSubtasksOfAddPage;
-  
-  return { title, description, assigned, date, prio, category, subtasks };
+
+  return { title, description, assignedTo, date, prio, category, subtasks };
 }
 
 /**
@@ -266,7 +268,7 @@ async function saveTaskAndRedirect(taskData) {
       taskData.title, taskData.description, taskData.assigned,
       taskData.date, taskData.prio, taskData.category, taskData.subtasks
     );
-    
+
     const response = await storeTask(newTask);
     if (response.status === "success") {
       cleanupTaskForm();

@@ -7,7 +7,7 @@ function simulateGuestTaskSave(task) {
     
     // Local storage
     const localTasks = getFromLocalStorage('tasks') || [];
-    localTasks.push(tasks);
+    localTasks.push(task);
     saveToLocalStorage('tasks', localTasks);
     
     return {

@@ -8,7 +8,7 @@
 async function createContact(name, email, phone) {
     const color = generateRandomColor();
     const newContact = createContactObject(name, email, phone, color);
-    
+
     try {
         // The current user is automatically assigned in the backend
         const response = await storeContact(newContact);
@@ -38,14 +38,14 @@ function createContactObject(name, email, phone, color) {
  */
 async function processContactResponse(response, contact) {
     const contactID = getContactIDFromResponse(response);
-    
+
     if (contactID) {
         // Update contact with ID and add to array
         contact.contactID = contactID;
-        
+
         // Only add contact to local array if it's intended for the current user
         contacts.push(contact);
-        
+
         // Local storage for offline access/guest mode
         updateContactsInLocalStorage(contacts);
         return contact;
@@ -63,13 +63,33 @@ function updateContactsInLocalStorage(contactsArray) {
 }
 
 /**
- * Extrahiert die Kontakt-ID aus der Antwort
+ * Finds a contact by ID from available contacts
+ * @param {string} id - Contact ID to find
+ * @returns {Object} - Contact object or null if not found
  */
-function getContactIDFromResponse(response) {
-    if (response.status === "success") {
-        return response.contactID || response.id;
+function getContactIDFromResponse(id) {
+    // Suche zuerst in den Kontakten der aktuellen Seite
+    for (let i = 0; i < contactsOfAddPage.length; i++) {
+        if (contactsOfAddPage[i].contactID == id) {
+            return contactsOfAddPage[i];
+        }
     }
-    return null;
+
+    // Alternativ in der Hauptkontaktliste suchen (falls vorhanden)
+    if (typeof contacts !== 'undefined') {
+        for (let i = 0; i < contacts.length; i++) {
+            if (contacts[i].contactID == id) {
+                return contacts[i];
+            }
+        }
+    }
+
+    // Wenn kein Kontakt gefunden wurde, gib ein Standardobjekt zurück
+    return {
+        name: "Unknown",
+        initials: "??",
+        color: "#6e6ee5"  // Standardfarbe
+    };
 }
 
 /**
@@ -77,12 +97,12 @@ function getContactIDFromResponse(response) {
  */
 function handleContactCreationError(contact, error) {
     console.error("Fehler beim Erstellen des Kontakts:", error);
-    
+
     // Füge trotzdem zum lokalen Array hinzu für bessere UX
     contact.contactID = createID(); // Temporäre lokale ID
     contacts.push(contact);
     saveToLocalStorage('contacts', contacts);
-    
+
     return contact;
 }
 
@@ -130,16 +150,16 @@ function openEditContact(i) {
 /**
  * Styles the edit contact window
  */
-function styleEditContact(){
+function styleEditContact() {
     document.getElementById('text-contact').innerHTML = 'Edit contact';
     document.getElementById('text-taskarebetter').classList.add('d-none');
     document.getElementById('join-logo').style.transform = "translateY(-10.968rem)";
     document.getElementById('container-addcontact').classList.add('d-none');
     document.getElementById('container-editcontact').classList.remove('d-none');
-    document.getElementById('button-save').style.backgroundColor='#2A3647';
-    if(screen.width < 1000){
-    document.getElementById('requiredtext').style.marginTop = "0";
-    document.getElementById('requiredemail').style.marginTop = "0";
+    document.getElementById('button-save').style.backgroundColor = '#2A3647';
+    if (screen.width < 1000) {
+        document.getElementById('requiredtext').style.marginTop = "0";
+        document.getElementById('requiredemail').style.marginTop = "0";
     }
 }
 
