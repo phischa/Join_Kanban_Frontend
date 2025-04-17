@@ -52,14 +52,14 @@ function collectBoardTaskData() {
   const assignedTo = assignedContacts.map(contact => ({
     contactID: contact.contactID
   }));
-  const date = document.getElementById("ldatename").value;
+  const dueDate = document.getElementById("ldatename").value;
   const prio = priority === 'none' ? 'medium' : priority;
   const category = document.getElementById("lcategoryname").value;
   
   finalizeSubtasks();
   const subtasks = finalSubtasksOfAddPage;
   
-  return { title, description, assignedTo, date, prio, category, subtasks };
+  return { title, description, assignedTo, dueDate, prio, category, subtasks };
 }
 
 /**
@@ -79,7 +79,7 @@ function cleanupBoardTaskForm() {
 function handleBoardTaskSaveError(error) {
   console.error("Failed to save board task:", error);
   const message = error.message || "Unknown error";
-  alert("Task could not be saved: " + message);
+  //alert("Task could not be saved: " + message);
 }
 
 /**
@@ -90,8 +90,8 @@ function handleBoardTaskSaveError(error) {
 async function saveBoardTaskAndUpdate(taskData) {
   try {
     const newTask = createTask(
-      taskData.title, taskData.description, taskData.assigned,
-      taskData.date, taskData.prio, taskData.category, taskData.subtasks
+      taskData.title, taskData.description, taskData.assignedTo,
+      taskData.dueDate, taskData.prio, taskData.category, taskData.subtasks
     );
     
     const response = await storeTask(newTask);

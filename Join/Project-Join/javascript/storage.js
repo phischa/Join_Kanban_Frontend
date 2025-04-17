@@ -660,7 +660,7 @@ function formatTaskForBackend(task) {
     if (formatted.priority && !["low", "medium", "urgent"].includes(formatted.priority)) {
         formatted.priority = "medium";
     }
-    if (formatted.category && !["todo", "inprogress", "done"].includes(formatted.category)) {
+    if (formatted.category && !["todo", "inprogress", "awaitfeedback", "done"].includes(formatted.category)) {
         formatted.category = "todo";
     }
     return formatted;
