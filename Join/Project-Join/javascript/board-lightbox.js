@@ -117,27 +117,33 @@ function generateListOfSubtask(columnNumber, id){
 * @param {number} maxCounter - set a max-amount of rendering icons in your element to prevent overvlow.
 */
 function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5){
-    // Safely check if assignedTo exists and is an array
     let assignedTo = list[columnNumber][id]["assignedTo"] || [];
+    if (!Array.isArray(assignedTo)) assignedTo = [];
     
-    // If it's not an array, make it an empty array
-    if (!Array.isArray(assignedTo)) {
-        assignedTo = [];
-    }
+    console.log("AssignedTo for task:", assignedTo); // Debugging
     
     let currentHTMLCode = "";
     let HTMLCode = "";
     
-    // Only loop if we have items
     for (let i = 0; i < assignedTo.length; i++){
+        // Hole den vollständigen Kontakt aus der globalen Kontaktliste
+        const contactId = assignedTo[i].contactID;
+        const contact = contactsOfAddPage.find(c => c.contactID == contactId) || {
+            color: "#6e6ee5",
+            initials: "??",
+            name: "Unknown"
+        };
+        
+        console.log("Found contact:", contact); // Debugging
+        
         if(i < maxCounter && isForCard){
-            currentHTMLCode = `<div style="background-color: ${assignedTo[i]["color"] || "#6e6ee5"}" class="avatar">${assignedTo[i]["initials"] || "??"}</div>`;
+            currentHTMLCode = `<div style="background-color: ${contact.color}" class="avatar">${contact.initials}</div>`;
         } else if (i >= maxCounter && isForCard){
             currentHTMLCode = `<div class="assignToNumber"><div class="numberOfAssignTo">+${assignedTo.length - maxCounter}</div></div>`;
             HTMLCode += currentHTMLCode;
             break;
         } else if(!isForCard){
-            currentHTMLCode = `<li><div style="background-color: ${assignedTo[i]["color"] || "#6e6ee5"}" class="circle">${assignedTo[i]["initials"] || "??"}</div><p>${assignedTo[i]["name"] || "Unknown"}</p></li>`;
+            currentHTMLCode = `<li><div style="background-color: ${contact.color}" class="circle">${contact.initials}</div><p>${contact.name}</p></li>`;
         }
         HTMLCode += currentHTMLCode;
     } 
