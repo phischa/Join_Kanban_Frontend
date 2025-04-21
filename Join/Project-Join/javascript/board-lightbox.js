@@ -1,7 +1,7 @@
 /**
 * after clicking on a card it opens a lightbox which contains the content of the current selected task.
 */
-function openLightboxCard(columnNumber, id){
+function openLightboxCard(columnNumber, id) {
     let content = document.getElementById("cardLightboxContent");
     delteEventListener();
     content.innerHTML = templateLightboxCards(columnNumber, id);
@@ -11,10 +11,10 @@ function openLightboxCard(columnNumber, id){
 /**
 * set the image in lightbox to symbolize a task is already done. 
 */
-function setSubtaskImage(columnNumber, id, i){
+function setSubtaskImage(columnNumber, id, i) {
     let imagePath = "../img/icons/check-button-mobile-uncheck.svg";
     isTaskDone = list[columnNumber][id]["subtasks"][i]["done"];
-    if (isTaskDone){
+    if (isTaskDone) {
         imagePath = "../img/icons/check-button-mobile-check.svg";
     }
     return imagePath;
@@ -25,7 +25,7 @@ function setSubtaskImage(columnNumber, id, i){
 * Sometimes a task doesn't include Subtasks. In this Case the Task-Card gets a hr to separate the elemnts inside of it. 
 * Just a visual effect in the Task- Element/Card.
 */
-function setDateFormat(columnNumber, id){
+function setDateFormat(columnNumber, id) {
     let currentDate = list[columnNumber][id]["dueDate"].split("-");
     let newDateFormat = currentDate[2] + "/" + currentDate[1] + "/" + currentDate[0]
     return newDateFormat
@@ -35,7 +35,7 @@ function setDateFormat(columnNumber, id){
 /**
 * Set and returns the current priority of a task.
 */
-function setPriorityName(columnNumber, id){
+function setPriorityName(columnNumber, id) {
     let currentPriority = list[columnNumber][id]["priority"];
     currentPriority = toTitleWord(currentPriority);
     return currentPriority
@@ -47,14 +47,14 @@ function setPriorityName(columnNumber, id){
 * in case there is no priority selected it returns 'Aktuell keine Prio'.
 * @param {string} - just your word, which you want to title.
 */
-function toTitleWord(string){
+function toTitleWord(string) {
     let newString = null;
-    if(string){
-    let firstLetter = string[0];
-    firstLetter = firstLetter.toUpperCase();
-    string = string.substr(1).toLowerCase();
-    newString = firstLetter + string;
-    } else{
+    if (string) {
+        let firstLetter = string[0];
+        firstLetter = firstLetter.toUpperCase();
+        string = string.substr(1).toLowerCase();
+        newString = firstLetter + string;
+    } else {
         newString = "Aktuell keine Prio"
     }
     return newString
@@ -65,11 +65,11 @@ function toTitleWord(string){
 * Switch the Status of a Subtask in done/unfinished by clicking on.
 * @param {number} subtaskId - index of the current subtask in task.
 */
-function changeStatusSubtask(columnNumber, id, subtaskId){
+function changeStatusSubtask(columnNumber, id, subtaskId) {
     let substaskStatus = list[columnNumber][id]["subtasks"][subtaskId]["done"];
-    if (substaskStatus){
+    if (substaskStatus) {
         list[columnNumber][id]["subtasks"][subtaskId]["done"] = false;
-    } else{
+    } else {
         list[columnNumber][id]["subtasks"][subtaskId]["done"] = true;
     }
     resetLightboxAndCard(columnNumber, id, "cardLightboxSubtask");
@@ -81,10 +81,10 @@ function changeStatusSubtask(columnNumber, id, subtaskId){
 * by uncheck/check a Subtask the Subtask-Area needs to get refreshed
 * @param {number} subtaskId - index of the current subtask in task.
 */
-function resetLightboxAndCard(columnNumber, id, elementId){
+function resetLightboxAndCard(columnNumber, id, elementId) {
     let lightbox = document.getElementById("cardLightboxContent");
     let card = document.getElementById(`ColumnNumb-${columnNumber}_Id-${id}`);
-    if(elementId){
+    if (elementId) {
         lightbox = document.getElementById(elementId);
         lightbox.innerHTML = generateListOfSubtask(columnNumber, id)
     } else {
@@ -97,14 +97,14 @@ function resetLightboxAndCard(columnNumber, id, elementId){
 /**
 * checks the task if it contains any subtasks and render it inside of lightbox otherwise it will rendering 'Keine Subtasks vorhanden!'.
 */
-function generateListOfSubtask(columnNumber, id){
+function generateListOfSubtask(columnNumber, id) {
     let currentHTMLCode = "";
     let HTMLCode = "";
-    for (let i = 0;  i < list[columnNumber][id]["subtasks"].length;i++){
+    for (let i = 0; i < list[columnNumber][id]["subtasks"].length; i++) {
         currentHTMLCode = `<li onclick="changeStatusSubtask(${columnNumber}, ${id}, ${i})"><img src="${setSubtaskImage(columnNumber, id, i)}"><p>${setText(false, false, ortext = list[columnNumber][id]["subtasks"][i]["subTaskName"], maxLength = 245)}</p></li>`;
         HTMLCode += currentHTMLCode;
     }
-    if(list[columnNumber][id]["subtasks"].length <=0){
+    if (list[columnNumber][id]["subtasks"].length <= 0) {
         HTMLCode = `<div>Keine Subtasks vorhanden!</div>`
     }
     return HTMLCode;
@@ -116,37 +116,33 @@ function generateListOfSubtask(columnNumber, id){
 * @param {boolean} isForCard - is needet to render it right for card or lightbox.
 * @param {number} maxCounter - set a max-amount of rendering icons in your element to prevent overvlow.
 */
-function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5){
+function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5) {
     let assignedTo = list[columnNumber][id]["assignedTo"] || [];
     if (!Array.isArray(assignedTo)) assignedTo = [];
-    
-    console.log("AssignedTo for task:", assignedTo); // Debugging
-    
     let currentHTMLCode = "";
     let HTMLCode = "";
-    
-    for (let i = 0; i < assignedTo.length; i++){
-        // Hole den vollständigen Kontakt aus der globalen Kontaktliste
+
+    if (contactsOfAddPage.length === 0 && contacts.length > 0) {
+        addContactsToPage(); // Kontakte von contacts zu contactsOfAddPage kopieren
+    }
+    for (let i = 0; i < assignedTo.length; i++) {
         const contactId = assignedTo[i].contactID;
-        const contact = contactsOfAddPage.find(c => c.contactID == contactId) || {
+        const contact = contactsOfAddPage.find(c => c.contactID == contactId || c.id == contactId) || {
             color: "#6e6ee5",
             initials: "??",
             name: "Unknown"
         };
-        
-        console.log("Found contact:", contact); // Debugging
-        
-        if(i < maxCounter && isForCard){
+        if (i < maxCounter && isForCard) {
             currentHTMLCode = `<div style="background-color: ${contact.color}" class="avatar">${contact.initials}</div>`;
-        } else if (i >= maxCounter && isForCard){
+        } else if (i >= maxCounter && isForCard) {
             currentHTMLCode = `<div class="assignToNumber"><div class="numberOfAssignTo">+${assignedTo.length - maxCounter}</div></div>`;
             HTMLCode += currentHTMLCode;
             break;
-        } else if(!isForCard){
+        } else if (!isForCard) {
             currentHTMLCode = `<li><div style="background-color: ${contact.color}" class="circle">${contact.initials}</div><p>${contact.name}</p></li>`;
         }
         HTMLCode += currentHTMLCode;
-    } 
+    }
     return HTMLCode;
 }
 
@@ -156,10 +152,10 @@ function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5){
 * @param {string} taskDescription - the raw text, which you want to trim.
 * @param {number} maxLength - the max-length which you want to receive.
 */
-function generateTeaserText(taskDescription, maxLength = 32){
+function generateTeaserText(taskDescription, maxLength = 32) {
     let splitWord = taskDescription.split(" ");
     let cutedText = "";
-    for (let i = 0; cutedText.length < maxLength; i++){
+    for (let i = 0; cutedText.length < maxLength; i++) {
         cutedText += splitWord[i] + " ";
     }
     cutedText = cutedText.split(0, -1);
@@ -173,14 +169,14 @@ function generateTeaserText(taskDescription, maxLength = 32){
 * @param {sting} taskDescription - raw Text - received by generateTeaserText()
 * @param {number} maxLength - received by generateTeaserText()
 */
-function checkForMaxLength(text, maxLength = 32){
+function checkForMaxLength(text, maxLength = 32) {
     let withoutSpace = "";
     let isTextLong = false;
     let splitWord = text.split(" ");
-    for(let i = 0; i < splitWord.length; i++){
+    for (let i = 0; i < splitWord.length; i++) {
         withoutSpace += splitWord[i];
     }
-    if (withoutSpace.length > maxLength){
+    if (withoutSpace.length > maxLength) {
         isTextLong = true;
     }
     return isTextLong
@@ -191,11 +187,11 @@ function checkForMaxLength(text, maxLength = 32){
 * Just checks the input - is the input already a text or need to looking for task-description.
 * @param {string} text - just raw text.
 */
-function receivedTaskOrText(text, columnNumber, id){
+function receivedTaskOrText(text, columnNumber, id) {
     let inputText = "";
-    if(text.length > 0){
+    if (text.length > 0) {
         inputText = text;
-    } else{
+    } else {
         inputText = list[columnNumber][id]["description"];
     }
     return inputText;
@@ -206,11 +202,11 @@ function receivedTaskOrText(text, columnNumber, id){
 * @param {string} ortext - in case you only got a text (if there is no option to fetch it from a task).
 * @param {number} maxLength - set a max amount of characters (no Spaces includet!) to cut your text.
 */
-function setText(columnId = 0, id = 0, ortext = "", maxLength = 36){
+function setText(columnId = 0, id = 0, ortext = "", maxLength = 36) {
     let taskDescription = receivedTaskOrText(ortext, columnId, id);
     let isTextLong = checkForMaxLength(taskDescription, maxLength);
     let cutedText = "";
-    if (isTextLong){
+    if (isTextLong) {
         cutedText = generateTeaserText(taskDescription, maxLength);
     } else {
         cutedText = taskDescription;
@@ -224,11 +220,11 @@ function setText(columnId = 0, id = 0, ortext = "", maxLength = 36){
 * Sometimes a task doesn't include Subtasks. In this Case the Task-Card gets a hr to separate the elemnts inside of it. 
 * Just a visual effect in the Task- Element/Card
 */
-function isSubtask(columnNumber, id){
+function isSubtask(columnNumber, id) {
     let subtasks = list[columnNumber][id]["subtasks"];
-    if (subtasks.length > 0){
+    if (subtasks.length > 0) {
         return templateSubTask(columnNumber, id)
-    } else{
+    } else {
         return `<hr>`
     }
 }

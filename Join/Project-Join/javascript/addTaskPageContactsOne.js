@@ -221,7 +221,11 @@ function sortAssignedContacts() {
  */
 function addContactsToPage() {
   for (let i = 0; i < contacts.length; i++) {
-    contactsOfAddPage.push(contacts[i]);
+    const contact = {
+      ...contacts[i],
+      contactID: contacts[i].contactID || contacts[i].id  
+    };
+    contactsOfAddPage.push(contact);
   }
   sortContacts();
 }
