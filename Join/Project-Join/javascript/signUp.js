@@ -272,7 +272,6 @@ function addBorderColorBlue(password, repeated_password) {
 
 /**
  * This function adds a blue border to the input fields of password or confirm password
- * 
  * @param {string} password 
  * @param {string} repeated_password
  */
