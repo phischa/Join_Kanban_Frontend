@@ -48,7 +48,7 @@ function renderContact(i, phoneNumber) {
 *  This function makes spaces in the phone number.
 */
 function spaceInPhoneNumber(string) {
-    if(string){     
+    if (string) {
         let phone = [string.slice(0, 2), " ", string.slice(2, 6), " ", string.slice(6, 8), " ", string.slice(8, 11), " ", string.slice(11, 13), " "].join('');
         return phone;
     } else {
@@ -73,30 +73,30 @@ let myStatus = false;
 /**
  *  This function checks the validity of input name, e-mail and phone. If it is correct, the function createContact() opens. 
  */
-function checkValidityNameEmailPhone(){
+function checkValidityNameEmailPhone() {
     let statusValidationName = document.getElementById('ltitlename');
     let statusValidationEmail = document.getElementById('ltitleemail');
     let statusValidationPhone = document.getElementById('ltitlephone');
     let email = document.getElementById('ltitleemail').value;
     let isAvailable = isThisEmailAvailable(email);
 
-    if(isAvailable){
+    if (isAvailable) {
         ifEmailAvailableBorderRed();
     } else {
         ifEmailNotAvailableBorderRed();
-    if(statusValidationName.checkValidity() && statusValidationEmail.checkValidity() && statusValidationPhone.checkValidity()){
-        enableCreateContactButton();
-        createTheContact();
-    } else {
-        disableCreateContactButton();
+        if (statusValidationName.checkValidity() && statusValidationEmail.checkValidity() && statusValidationPhone.checkValidity()) {
+            enableCreateContactButton();
+            createTheContact();
+        } else {
+            disableCreateContactButton();
+        }
     }
-  }
 }
 
 /**
  *  This function created once the edit contact
  */
-function createTheContact(){
+function createTheContact() {
     let eventButton = document.getElementById('button-createcontact');
 
     eventButton.addEventListener("click", function () {
@@ -110,49 +110,49 @@ function createTheContact(){
 /**
  * This function enable the create contact button and change the color.
  */
-function enableCreateContactButton(){
+function enableCreateContactButton() {
     document.getElementById('button-createcontact').disabled = false;
-    document.getElementById('button-createcontact').style.backgroundColor='#2A3647';
+    document.getElementById('button-createcontact').style.backgroundColor = '#2A3647';
     document.getElementById('button-createcontact').style.cursor = "pointer";
 }
 
 /**
  * This function enable the create contact button and change the color.
  */
-function disableCreateContactButton(){
+function disableCreateContactButton() {
     document.getElementById('button-createcontact').disabled = true;
-    document.getElementById('button-createcontact').style.backgroundColor='#E5E5E5';
+    document.getElementById('button-createcontact').style.backgroundColor = '#E5E5E5';
     document.getElementById('button-createcontact').style.cursor = "default";
-}  
+}
 
 /**
  *  This function checks the validity of input name, e-mail and phone. If the mouse is above the button and if the validation isn't correct, 
  *  the border of the elements ltitlename, ltitleemail, ltitlephone and text "This field is required" will be red.
 */
-function validityFalseAboveButtonRedBorder(){
+function validityFalseAboveButtonRedBorder() {
     let statusValidationName = document.getElementById('ltitlename');
     let statusValidationEmail = document.getElementById('ltitleemail');
     let statusValidationPhone = document.getElementById('ltitlephone');
 
     removesFocusFromInputField();
     changeBackColorFromButtonAddContactPage();
-    checkValidationByTrueBorderRed(statusValidationName,statusValidationEmail,statusValidationPhone);
+    checkValidationByTrueBorderRed(statusValidationName, statusValidationEmail, statusValidationPhone);
 }
 
 /**
  *  This function check the Validation from input field and if it true, the color of border will be red.
  */
-function checkValidationByTrueBorderRed(statusValidationName,statusValidationEmail,statusValidationPhone){
-    if(!statusValidationName.checkValidity() || !statusValidationEmail.checkValidity() || !statusValidationPhone.checkValidity()){
+function checkValidationByTrueBorderRed(statusValidationName, statusValidationEmail, statusValidationPhone) {
+    if (!statusValidationName.checkValidity() || !statusValidationEmail.checkValidity() || !statusValidationPhone.checkValidity()) {
         document.getElementById('requiredtext').style.border = '2px solid red';
     }
-    if(!statusValidationName.checkValidity()){
+    if (!statusValidationName.checkValidity()) {
         checkedNameAndGivesMessage();
     }
-    if(!statusValidationEmail.checkValidity()){
+    if (!statusValidationEmail.checkValidity()) {
         checkedEmailAndGivesMessage();
     }
-    if(!statusValidationPhone.checkValidity()){
+    if (!statusValidationPhone.checkValidity()) {
         checkedPhoneAndGivesMessage();
     }
 }
@@ -160,8 +160,8 @@ function checkValidationByTrueBorderRed(statusValidationName,statusValidationEma
 /**
  * This function test the validation of the name and return an statement 
  */
-function checkedNameAndGivesMessage(){
-    if(screen.width < 1000){
+function checkedNameAndGivesMessage() {
+    if (screen.width < 1000) {
         requiredTextBetweenInputFieldInTheMobileVersion('name');
         document.getElementById('required-name').innerHTML = "* Fill in your whole name";
     } else {
@@ -173,8 +173,8 @@ function checkedNameAndGivesMessage(){
 /**
  * This function test the validation of the email and return an statement 
  */
-function checkedEmailAndGivesMessage(){
-    if(screen.width < 1000){
+function checkedEmailAndGivesMessage() {
+    if (screen.width < 1000) {
         requiredTextBetweenInputFieldInTheMobileVersion('email');
         document.getElementById('required-email').innerHTML = "* The email must be a valid email-address";
     } else {
@@ -186,8 +186,8 @@ function checkedEmailAndGivesMessage(){
 /**
  * This function test the validation of the phone-number and return an statement 
  */
-function checkedPhoneAndGivesMessage(){
-    if(screen.width < 1000){
+function checkedPhoneAndGivesMessage() {
+    if (screen.width < 1000) {
         requiredTextBetweenInputFieldInTheMobileVersion('phone');
         document.getElementById('required-phone').innerHTML = "* Number has to be betw. 9 and 15 digits";
     } else {
@@ -199,19 +199,19 @@ function checkedPhoneAndGivesMessage(){
 /**
  * This function show required text between the gap of the input fields in the mobile version
  */
-function requiredTextBetweenInputFieldInTheMobileVersion(choice){
+function requiredTextBetweenInputFieldInTheMobileVersion(choice) {
     document.getElementById(`required-${choice}`).style.display = "block";
     document.getElementById(`required-${choice}`).style.margin = "0.3rem 0 0 0.625rem";
     document.getElementById(`required-${choice}`).style.height = "1.5rem";
-    document.getElementById(`ltitle${choice}`).style.outline = '2px solid red'; 
+    document.getElementById(`ltitle${choice}`).style.outline = '2px solid red';
 }
 
 /**
  * This function show required text between the gap of the input fields in the desktop version
  */
-function requiredTextBetweenInputFieldInTheDesktopVersion(choice){
+function requiredTextBetweenInputFieldInTheDesktopVersion(choice) {
     document.getElementById(`required-${choice}`).style.display = "block";
     document.getElementById(`required-${choice}`).style.margin = "0.5rem 0 0 0.5rem";
     document.getElementById(`required-${choice}`).style.minHeight = "1.932rem";
-    document.getElementById(`ltitle${choice}`).style.outline = '2px solid red'; 
+    document.getElementById(`ltitle${choice}`).style.outline = '2px solid red';
 }

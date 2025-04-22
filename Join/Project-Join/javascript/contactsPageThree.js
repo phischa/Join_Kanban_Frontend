@@ -27,7 +27,6 @@ function deleteContactOfContactPage() {
  */
 async function deleteContact(contactID) {
     try {
-        // Uses the new function that checks user permissions
         const response = await deleteUserContact(contactID);
         return await processDeleteResponse(response, contactID);
     } catch (error) {
@@ -36,7 +35,7 @@ async function deleteContact(contactID) {
 }
 
 /**
- * Verarbeitet die Antwort nach dem Löschen eines Kontakts
+ * Works with the return after deleting a contact
  */
 async function processDeleteResponse(response, contactID) {
     if (response.status === "success") {
@@ -50,12 +49,10 @@ async function processDeleteResponse(response, contactID) {
 }
 
 /**
- * Behandelt Fehler während des Löschens eines Kontakts
+ * Deals with error while deleting a contact
  */
 function handleDeleteError(error, contactID) {
     console.error("Fehler beim Löschen des Kontakts:", error);
-
-    // Aktualisiere trotzdem lokalen Status für bessere UX
     removeContactFromLocalArray(contactID);
     saveToLocalStorage('contacts', contacts);
 
@@ -63,7 +60,7 @@ function handleDeleteError(error, contactID) {
 }
 
 /**
- * Entfernt einen Kontakt aus dem lokalen Array anhand seiner ID
+ * Deletes a contact from the local array based on the id
  */
 function removeContactFromLocalArray(contactID) {
     const index = contacts.findIndex(c => c.contactID == contactID);
@@ -73,7 +70,7 @@ function removeContactFromLocalArray(contactID) {
 }
 
 /** 
- * Löscht den ausgewählten Kontakt im Speicher.
+ * Deletes the chosen contacts in the storage
  */
 async function finallyDeleted() {
     const contactID = contacts[editIndex]['contactID'] + '';
