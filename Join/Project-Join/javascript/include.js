@@ -81,8 +81,8 @@ function getUserInfoFromStorage() {
 }
 
 /**
- * Holt das actualUser Objekt aus dem localStorage
- * @returns {Object|null} Das actualUser Objekt oder null
+ * Get the actualUser object from the localStorage
+ * @returns {Object|null} The actualUser object or null
  */
 function getActualUserObject() {
   const actualUserJson = localStorage.getItem('actualUser');
@@ -97,8 +97,8 @@ function getActualUserObject() {
 }
 
 /**
- * Zeigt die Benutzerinitialen basierend auf den verfügbaren Informationen an
- * @param {Object} userInfo Benutzerinformationen
+ * Displays user initials based on the information available
+ * @param {Object} userInfo user informationen
  */
 function displayUserInitials(userInfo) {
   const { username, actualUserObj, isGuest } = userInfo;
@@ -115,9 +115,9 @@ function displayUserInitials(userInfo) {
 }
 
 /**
- * Extrahiert Initialen aus einem Namen
- * @param {string} name - Der Name
- * @returns {string} - Die Initialen
+ * Extracts initials from a name
+ * @param {string} name - the name
+ * @returns {string} - the initials
  */
 function getInitialsFromName(name) {
   const words = name.split(" ");
@@ -134,8 +134,8 @@ function getInitialsFromName(name) {
 }
 
 /**
- * Fügt die Benutzerinitialen in den Header ein
- * @param {string} name - Der Name
+ * Inserts the user initials into the header
+ * @param {string} name - the name
  */
 function addUserInitialsToHeader(name) {
   const initials = getInitialsFromName(name);
@@ -203,21 +203,18 @@ function drawColoredCircle(colorCode, text, canvasID) {
 
   ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingQuality = "high";
-  // Circle Background
+
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
   ctx.fillStyle = colorCode;
   ctx.fill();
-  // Brightness
+
   let brightness = calculateBrightness(colorCode);
-  // TExtcolor white or black depending on britghntess of color
   let textColor = brightness > 128 ? "#000000" : "#ffffff";
-  // text specifications
   ctx.font = "1rem Inter";
   ctx.fillStyle = textColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  // finally drawing the circle
   ctx.fillText(text, centerX, centerY);
 }
 
@@ -228,11 +225,9 @@ function drawColoredCircle(colorCode, text, canvasID) {
  * @returns {number} - brightness
  */
 function calculateBrightness(hexColor) {
-  //get rgb values
   let r = parseInt(hexColor.substring(1, 3), 16);
   let g = parseInt(hexColor.substring(3, 5), 16);
   let b = parseInt(hexColor.substring(5, 7), 16);
-  // calculate brightness
   let brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness;
 }

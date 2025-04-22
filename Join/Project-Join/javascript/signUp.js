@@ -75,9 +75,7 @@ async function sendRegistrationToBackend(email, username, password, repeated_pas
     });
     
     const data = await response.json();
-    console.log('Backend-Antwort:', data);
     
-    // Erfolgs-Status hinzufügen, falls er vom Backend nicht gesetzt wurde
     if (!data.status) {
       data.status = response.ok ? 'success' : 'error';
     }
@@ -140,8 +138,6 @@ function storeUserData(data) {
  */
 function handleRegistrationError(data) {
   console.error('Registrierungsfehler:', data.errors || data.message);
-  
-  // Spezifische Fehlermeldung im Pop-up anzeigen
   const errorSpan = document.querySelector('#popup-fail .button');
   
   if (data.errors && data.errors.email) {

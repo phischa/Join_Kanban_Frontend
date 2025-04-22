@@ -1,7 +1,6 @@
 let currenOnDrag = "";
 isMobil = checkIsMobil();
 
-
 /**
 * If the User change the size of his windows. This function will check if it needet to switch to mobil-view.
 */
@@ -9,7 +8,6 @@ addEventListener("resize", (event) => {
     isMobil = checkIsMobil();
     showDropZone(0, true, false)   
 })
-
 
 /**
 * @returns {boolean} isMobil - the gobal isMobil will set to true or false
@@ -23,7 +21,6 @@ function checkIsMobil(){
     return isMobil
 }
 
-
 /**
 * initialize Dragzone inot board
 */
@@ -34,7 +31,6 @@ function show_dragzone(){
     }
     showNoCard(true);
 }
-
 
 /**
 *  insert needet elements for each columns for the first time after rerender/load the columns. 
@@ -49,14 +45,12 @@ function initDropZone(){
     }
 }
 
-
 /**
 *  just allow to drop your Task in your Element
 */
 function allowDrop(ev) {
     ev.preventDefault();
 }
-
 
 /**
 *  @param {boolean} visible - to disable/enable the NoTaskCard 
@@ -71,7 +65,6 @@ function showNoCard(visible = true){
         }
     }
 }
-
 
 /** checks in which view the user is and decide which Drop-Zone is to needed to use
 * @param {boolean} atAll - if yes, every element will gets hide/show.
@@ -92,7 +85,6 @@ function showDropZone(columnId, atAll, visible){
         showNoCard(false);
     }
 }
-
 
 /**
 * @returns {element} element - just select in which view the user actuell is.
@@ -129,7 +121,6 @@ function loopThoughColumns(dragZoneElement, columnId, atAll, visible){
     }
 }
 
-
 /** to blur a element/Card
 * @param {boolean} removeAll - set it on to affect all Task.
 */
@@ -148,7 +139,6 @@ function blurCard(columnId, removeAll = false){
     }
 }
 
-
 /** will happen by draggin a card
 * @param {boolean} atAllboolean - set it on to affect all Task.
 */
@@ -156,7 +146,6 @@ function startDragFrom(columnId, id, atAllboolean = false){
     showDropZone(columnId, atAllboolean, true);
     currenOnDrag = [columnId, id];
 }
-
 
 /**
  * Updates a task's progress in memory
@@ -201,14 +190,12 @@ async function moveTo(category) {
     }
 }
 
-
 /** reset all settings after the drag event is over. 
 * @param {boolean} atAllboolean - set it on to affect all Task.
 */
 function endDrag(columnId, atAllboolean){
     showDropZone(columnId, atAllboolean, false);
 }
-
 
 /**
  * Add this function to handle task movement with proper backend communication
