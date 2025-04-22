@@ -42,7 +42,8 @@ function renderDaytime(divId) {
   let daytime = actualHour();
   let greeting = getGreeting(daytime);
   let field = document.getElementById(divId);
-  if (actualUser.name) {
+  let username = localStorage.getItem('username');
+  if (username) {
     //Condition that a User is logged in
     field.innerHTML = greeting + ",";
   } else {
@@ -85,10 +86,11 @@ function getGreeting(daytime) {
  */
 function renderUserName(divID) {
   let user;
+  let username = localStorage.getItem('username');
   field = document.getElementById(divID);
 
-  if (actualUser.name) {
-    user = actualUser.name;
+  if (username) {
+    user = username;
     field.innerHTML = user;
   } else {
     field.innerHTML = "";
