@@ -99,12 +99,7 @@ function handleContactSaveError(error) {
  * @param {string} phone - Phone number of the contact
  */
 async function overwritingAvaibleContact(name, email, phone) {
-    // Update local data
     updateLocalContact(editIndex, name, email, phone);
-    
-    // Prepare data for backend
     const contactData = prepareContactForBackend(editIndex, name, email, phone);
-    
-    // Send to backend
     await saveContactToBackend(contactData);
 }

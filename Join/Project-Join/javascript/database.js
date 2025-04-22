@@ -17,7 +17,7 @@ let actualUser = "Standarduser";
 let actualSubtask = null;
 
 /**
- * Liste der öffentlich zugänglichen Seiten (ohne Authentifizierung)
+ * List of publicly accessible pages (without authentication)
  */
 const PUBLIC_PAGES = [
     'signUp.html',
@@ -28,8 +28,8 @@ const PUBLIC_PAGES = [
 ];
 
 /**
- * Überprüft, ob die aktuelle Seite öffentlich zugänglich ist
- * @returns {boolean} True wenn die Seite öffentlich ist
+ * Checks whether the current page is publicly accessible
+ * @returns {boolean} True if the page is public
  */
 function isPublicPage() {
     const currentPath = window.location.pathname;
@@ -46,8 +46,8 @@ function isAuthPage() {
 }
 
 /**
- * Überprüft, ob ein Benutzer authentifiziert oder im Gast-Modus ist
- * @returns {boolean} True, wenn der Benutzer eingeloggt oder im Gast-Modus ist
+ * Checks whether a user is authenticated or in guest mode
+ * @returns {boolean} True if the user is logged in or in guest mode
  */
 function isAuthenticatedOrGuest() {
     const hasToken = isAuthenticated();
@@ -105,21 +105,15 @@ function logout() {
  */
 async function initApp() {
     try {
-        // Auf öffentlichen Seiten keine Authentifizierung prüfen
         if (isPublicPage()) {
             return;
         }
-        // Authentifizierung oder Gast-Modus prüfen
         if (!isAuthenticatedOrGuest()) {
             window.location.href = 'start.html';
             return;
         }
-        // Prüfen, ob wir auf der Kontaktseite sind
         const isContactPage = window.location.pathname.includes('contactsPage.html');
-        
-        // Kontakte werden bereits vom contactUserManagement.js geladen, wenn wir auf der Kontaktseite sind
         if (!isContactPage) {
-            // Nur Kontakte laden, wenn wir NICHT auf der Kontaktseite sind (vermeidet Doppelladung)
             await loadUserContactsIfAvailable();
         }
         await Promise.all([
@@ -152,11 +146,9 @@ async function loadUserContactsIfAvailable() {
             }
         } catch (error) {
             console.error("Error using loadUserContacts:", error);
-            // Fallback to local storage
             loadFromLocalStorage('contacts', contacts);
         }
     } else {
-        // Use old method as fallback
         await loadContacts();
     }
 }
@@ -194,12 +186,10 @@ async function loadContacts() {
 async function loadTasks() {
     try {
         const loadedTasks = await loadAllTasks();
-
         if (Array.isArray(loadedTasks)) {
             tasks = loadedTasks;
         } else {
             console.error("Invalid tasks data:", loadedTasks);
-            // Only use localStorage fallback in guest mode
             if (isGuestMode()) {
                 loadFromLocalStorage('tasks', tasks);
             } else {
