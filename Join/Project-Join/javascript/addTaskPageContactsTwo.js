@@ -7,9 +7,7 @@ function renderCanvases() {
   for (let i = 0; i < canvases.length; i++) {
     let canvas = canvases[i];
     id = canvas.id;
-
     let contact = getContactIDFromResponse(id);
-
     drawColoredCircle(contact.color, contact.initials, id);
   }
 }
@@ -121,7 +119,6 @@ function checkForImage(element) {
  */
 function getOptionRowHTML(i, checkIMG) {
   return ` 
-    
     <label class="optionRow" for="one" id="label${contactsOfAddPage[i].contactID}" 
     onclick="addToRemoveFromTask('${contactsOfAddPage[i].contactID}')">
         <canvas class="dropdownMenuCanvas" width="48" height="48" id="${contactsOfAddPage[i].contactID}"></canvas>

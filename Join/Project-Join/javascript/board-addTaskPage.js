@@ -55,7 +55,7 @@ function collectBoardTaskData() {
   const dueDate = document.getElementById("ldatename").value;
   const prio = priority === 'none' ? 'medium' : priority;
   const category = document.getElementById("lcategoryname").value;
-  
+
   finalizeSubtasks();
   const subtasks = finalSubtasksOfAddPage;
   
@@ -123,16 +123,12 @@ async function submitTaskOnBoard() {
 async function setTaskToBoard() {
     hideBlackbox();
     delteEventListener();
-    
-    // Small delay to ensure API processing
     setTimeout(async () => {
         await baordLoadTasks();
         
-        // Optional functions if they exist
         if (typeof loadActualUser === 'function') await loadActualUser();
         if (typeof initialsOf === 'function') await initialsOf();
         
-        // Refresh board
         sortLoadetTasks();
         cleanAllColums();
         checkForCard();
@@ -141,7 +137,6 @@ async function setTaskToBoard() {
         showDropZone(0, true);
     }, 250);
 }
-
 
 /**
 * in addition to clean the form by clicking the button 'Clear'

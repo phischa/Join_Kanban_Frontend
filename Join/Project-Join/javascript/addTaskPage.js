@@ -9,9 +9,6 @@ async function onload() {
   loadTasks();
   loadUsers();
   await loadUserContactsIfAvailable();
-  //await loadActualUser();
-  //await initialsOf();
-  /* pressMediumButton(); */
   addContactsToPage();
   CheckforUnclosedWindows();
   checkRequirementsMouseover();
@@ -32,9 +29,8 @@ function setMinDate() {
 }
 
 /**
- * -------  Hover over disabled CreateTaskButton results in red border for required -------
+ * Hover over disabled CreateTaskButton results in red border for required
  * checks if the form requirements are fullfilled every time the duetate is changed
- * 
 */
 function checkRequirementsDuetate() {
   document
@@ -55,11 +51,9 @@ function checkRequirementsMouseover() {
       let date = document.getElementById("ldatename");
       let category = document.getElementById("lcategoryname");
       let text = document.getElementById("requiredText");
-
       requiredTitle();
       requiredDate();
       requiredCategory();
-
       if (title.value == "" || !date.value || !category.selectedIndex > 0) {
         text.style.border = "2px solid red";
       }
@@ -74,11 +68,9 @@ function CheckMouseoutCreateTask() {
     .getElementById("createTaskButton")
     .addEventListener("mouseout", function (event) {
       let text = document.getElementById("requiredText");
-
       requiredTitleNorm();
       requiredDateNorm();
       requiredCategoryNorm();
-
       if (text.style.border == "2px solid red") {
         text.style.border = "";
       }
@@ -89,7 +81,6 @@ function CheckMouseoutCreateTask() {
  */
 function requiredTitle() {
   let title = document.getElementById("ltitlename");
-
   if (title.value == "") {
     title.style.border = "2px solid red";
     title.style.padding = "1px 15px 1px 15px";
@@ -171,9 +162,6 @@ function unclosedWindowsEvent(event) {
   checkSubtaskEventArea(targetElement);
 }
 
-//-------Funktionen zum Disablen des createTaskButtons
-// after every letting a key go it is checked whether the createTaskButton needs to be disbaled
-
 function alreadyCheckeCreateTask(event) {
   checkCreateTask();
 }
@@ -181,7 +169,6 @@ function alreadyCheckeCreateTask(event) {
 /**
  * disabled or enables the createTaskButton depending on the inputstate of the required fields
  */
-
 function checkCreateTask() {
   if (
     document.getElementById("ltitlename").value.length >= 1 &&
@@ -208,7 +195,6 @@ function clearForm() {
   assignedContacts = [];
   document.getElementById("ldatename").value = "";
   uncheckprio();
-  /* pressMediumButton(); */
   document.getElementById("lcategoryname").value = "Select task category";
   clearSubtaskInput();
   subtasksOfAddPage = [];
@@ -229,10 +215,8 @@ function collectTaskData() {
   const dueDate = document.getElementById("ldatename").value;
   const prio = priority === 'none' ? 'medium' : priority;
   const category = document.getElementById("lcategoryname").value;
-
   finalizeSubtasks();
   const subtasks = finalSubtasksOfAddPage;
-
   return { title, description, assignedTo, dueDate, prio, category, subtasks };
 }
 
@@ -253,19 +237,13 @@ function cleanupTaskForm() {
  */
 function handleTaskSaveError(error) {
   console.error("Failed to save task:", error);
-  
-  // Mehr Details anzeigen
   if (error.message) {
     console.error("Error message:", error.message);
   }
-  
-  // Falls der Server eine detaillierte Antwort sendet
   if (error.response) {
     console.error("Server response:", error.response);
   }
-  
   const message = error.message || "Unknown error";
-  //alert("Task could not be saved: " + message);
 }
 
 /**
@@ -279,7 +257,6 @@ async function saveTaskAndRedirect(taskData) {
       taskData.title, taskData.description, taskData.assignedTo,
       taskData.dueDate, taskData.prio, taskData.category, taskData.subtasks
     );
-
     const response = await storeTask(newTask);
     if (response.status === "success") {
       cleanupTaskForm();
@@ -308,8 +285,6 @@ function goToBoard() {
   window.location.href = "board.html";
 }
 
-//------ Modal Functions
-
 /**
  * shows the modal
  */
@@ -317,8 +292,6 @@ function showModal() {
   modal = document.getElementById("modalConfirmTaskCreated");
   modal.style.display = "flex";
 }
-
-//---------- Functions for Setting Priority
 
 /**
  * pressing the button results in marking itself if unmarked, unmarking
