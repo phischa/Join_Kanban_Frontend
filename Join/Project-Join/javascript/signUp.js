@@ -21,13 +21,13 @@ function newUser() {
 }
 
 /**
- * Überprüft ob die Passwörter übereinstimmen und sendet dann die 
- * Registrierungsdaten an das Backend oder zeigt einen Fehler an.
+ * Checks if the passwords match and then sends the
+ * registration data to the backend or shows an error.
  * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} username - Benutzername des neuen Nutzers
- * @param {string} password - Passwort des neuen Nutzers
- * @param {string} repeated_password - Passwortbestätigung
+ * @param {string} email - Email of the new user
+ * @param {string} username - Username of the new user
+ * @param {string} password - Password of the new user
+ * @param {string} repeated_password - Password confirmation
  */
 async function passwordConfirm(email, username, password, repeated_password) {
   if (password === repeated_password) {
@@ -39,13 +39,13 @@ async function passwordConfirm(email, username, password, repeated_password) {
 }
 
 /**
- * Erstellt die Payload für die Registrierungsanfrage
+ * Creates the payload for the registration request
  * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} username - Benutzername 
- * @param {string} password - Passwort
- * @param {string} repeated_password - Passwortbestätigung
- * @returns {Object} Registrierungsdaten als JSON
+ * @param {string} email - Email of the new user
+ * @param {string} username - Username
+ * @param {string} password - Password
+ * @param {string} repeated_password - Password confirmation
+ * @returns {Object} Registration data as JSON
  */
 function createRegistrationPayload(email, username, password, repeated_password) {
   return {
@@ -57,13 +57,13 @@ function createRegistrationPayload(email, username, password, repeated_password)
 }
 
 /**
- * Sendet Registrierungsdaten an das Django-Backend
+ * Sends registration data to the Django backend
  * 
- * @param {string} email - E-Mail des neuen Nutzers
- * @param {string} username - Benutzername 
- * @param {string} password - Passwort
- * @param {string} repeated_password - Passwortbestätigung
- * @returns {Promise<Object>} Antwort vom Server
+ * @param {string} email - Email of the new user
+ * @param {string} username - Username
+ * @param {string} password - Password
+ * @param {string} repeated_password - Password confirmation
+ * @returns {Promise<Object>} Response from the server
  */
 async function sendRegistrationToBackend(email, username, password, repeated_password) {
   try {
@@ -82,22 +82,22 @@ async function sendRegistrationToBackend(email, username, password, repeated_pas
     
     return data;
   } catch (error) {
-    console.error('Registrierungsanfrage fehlgeschlagen:', error);
+    console.error('Registration request failed:', error);
     return { 
       status: 'error', 
-      message: 'Verbindungsfehler zum Server',
-      errors: { general: 'Verbindungsfehler zum Server' }
+      message: 'Connection error to server',
+      errors: { general: 'Connection error to server' }
     };
   }
 }
 
 /**
- * Verarbeitet die Antwort vom Server nach dem Registrierungsversuch
+ * Processes the response from the server after the registration attempt
  * 
- * @param {Object} data - Antwort vom Server
+ * @param {Object} data - Response from the server
  */
 function handleRegistrationResponse(data) {
-  console.log('Verarbeite Registrierungsantwort:', data);
+  console.log('Processing registration response:', data);
   
   if (data.status === 'success') {
     handleSuccessfulRegistration(data);
@@ -107,9 +107,9 @@ function handleRegistrationResponse(data) {
 }
 
 /**
- * Verarbeitet erfolgreiche Registrierungen
+ * Processes successful registrations
  * 
- * @param {Object} data - Erfolgsdaten vom Server
+ * @param {Object} data - Success data from the server
  */
 function handleSuccessfulRegistration(data) {
   storeUserData(data);
@@ -118,9 +118,9 @@ function handleSuccessfulRegistration(data) {
 }
 
 /**
- * Speichert Nutzerdaten nach erfolgreicher Registrierung
+ * Stores user data after successful registration
  * 
- * @param {Object} data - Nutzerdaten vom Server
+ * @param {Object} data - User data from the server
  */
 function storeUserData(data) {
   const user = {
@@ -132,12 +132,12 @@ function storeUserData(data) {
 }
 
 /**
- * Verarbeitet Fehler bei der Registrierung
+ * Processes errors during registration
  * 
- * @param {Object} data - Fehlerdaten vom Server
+ * @param {Object} data - Error data from the server
  */
 function handleRegistrationError(data) {
-  console.error('Registrierungsfehler:', data.errors || data.message);
+  console.error('Registration error:', data.errors || data.message);
   const errorSpan = document.querySelector('#popup-fail .button');
   
   if (data.errors && data.errors.email) {
@@ -150,13 +150,13 @@ function handleRegistrationError(data) {
     errorSpan.textContent = data.errors.password;
     showCustomError();
   } else {
-    errorSpan.textContent = 'Fehler bei der Registrierung';
+    errorSpan.textContent = 'Error during registration';
     showCustomError();
   }
 }
 
 /**
- * Zeigt eine benutzerdefinierte Fehlermeldung an
+ * Shows a custom error message
  */
 function showCustomError() {
   unsuccessfulText();
@@ -164,7 +164,7 @@ function showCustomError() {
 }
 
 /**
- * Zeigt Fehlermeldung für nicht übereinstimmende Passwörter
+ * Shows error message for non-matching passwords
  */
 function showPasswordMismatchError() {
   wrongPasswordText();

@@ -123,7 +123,7 @@ function generateAssignedTo(columnNumber, id, isForCard, maxCounter = 5) {
     let HTMLCode = "";
 
     if (contactsOfAddPage.length === 0 && contacts.length > 0) {
-        addContactsToPage(); // Kontakte von contacts zu contactsOfAddPage kopieren
+        addContactsToPage();
     }
     for (let i = 0; i < assignedTo.length; i++) {
         const contactId = assignedTo[i].contactID;

@@ -35,7 +35,7 @@ function saveSelectedContact(name, email, phone, i){
 }
 
 /**
- * Aktualisiert lokale Kontaktdaten
+ * Updates local contact data
  */
 function updateLocalContact(index, name, email, phone) {
     contacts[index].name = name;
@@ -45,7 +45,7 @@ function updateLocalContact(index, name, email, phone) {
 }
 
 /**
- * Bereitet Kontaktdaten für das Backend vor
+ * Prepares contact data for the backend
  */
 function prepareContactForBackend(index, name, email, phone) {
     return {
@@ -59,7 +59,7 @@ function prepareContactForBackend(index, name, email, phone) {
 }
 
 /**
- * Speichert Kontaktdaten im Backend
+ * Saves contact data to the backend
  */
 async function saveContactToBackend(contactData) {
     try {
@@ -73,22 +73,22 @@ async function saveContactToBackend(contactData) {
 }
 
 /**
- * Behandelt die Antwort vom Backend
+ * Handles the response from the backend
  */
 function handleContactSaveResponse(response) {
     if (response.status !== "success") {
-        console.error("Kontakt konnte nicht im Backend aktualisiert werden:", response);
+        console.error("Contact could not be updated in the backend:", response);
         localStorage.setItem('contacts', JSON.stringify(contacts));
     } else {
-        console.log("Kontakt erfolgreich aktualisiert");
+        console.log("Contact successfully updated");
     }
 }
 
 /**
- * Behandelt Fehler während der Backend-Kommunikation
+ * Handles errors during backend communication
  */
 function handleContactSaveError(error) {
-    console.error("Fehler beim Aktualisieren des Kontakts:", error);
+    console.error("Error updating the contact:", error);
     localStorage.setItem('contacts', JSON.stringify(contacts));
 }
 
