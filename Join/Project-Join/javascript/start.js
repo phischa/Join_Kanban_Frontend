@@ -23,9 +23,9 @@ function setupFormListener() {
  */
 function setupFormSubmitPrevention() {
     const form = document.getElementById('form');
-    
+
     if (form) {
-        form.onsubmit = function(e) {
+        form.onsubmit = function (e) {
             console.log("Form submit prevented");
             if (e) {
                 e.preventDefault();
@@ -41,9 +41,9 @@ function setupFormSubmitPrevention() {
  */
 function setupLoginButtonHandler() {
     const loginBtn = document.getElementById('login-btn');
-    
+
     if (loginBtn) {
-        loginBtn.addEventListener('click', function(e) {
+        loginBtn.addEventListener('click', function (e) {
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -76,7 +76,7 @@ function isLocalRemember() {
 async function handleManualLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
+
     handleRememberMe(email, password);
     removeRedMail();
     await login(email, password);
@@ -108,7 +108,7 @@ async function login(email, password) {
     try {
         console.log("Attempting login with:", email);
         const result = await authenticateUser(email, password);
-        
+
         handleLoginResult(result);
     } catch (error) {
         console.error('Login error:', error);
@@ -122,7 +122,7 @@ async function login(email, password) {
  */
 function handleLoginResult(result) {
     console.log("Login result:", result);
-    
+
     if (result.status === "success") {
         storeActualUser(result.user);
         window.location.href = 'summary.html';
@@ -136,7 +136,7 @@ function handleLoginResult(result) {
  */
 function handleLoginError(errorMessage) {
     console.log("Login error:", errorMessage);
-    
+
     const errorMsg = errorMessage.toLowerCase();
     if (isEmailRelatedError(errorMsg)) {
         colorRedMail();
@@ -151,9 +151,9 @@ function handleLoginError(errorMessage) {
  * Checks if error is related to email/username
  */
 function isEmailRelatedError(errorMsg) {
-    return errorMsg.includes('user') || 
-           errorMsg.includes('username') || 
-           errorMsg.includes('email');
+    return errorMsg.includes('user') ||
+        errorMsg.includes('username') ||
+        errorMsg.includes('email');
 }
 
 /**
@@ -175,35 +175,22 @@ function loginCheck(email) {
  * This function logs in a guest user. 
  */
 function guestLogin() {
-    console.log("Logging in as guest user");
-    
-    // Wichtig: Event stoppen, falls es von einem Button-Klick kommt
     event && event.preventDefault && event.preventDefault();
-    
-    // Authentifizierungsdaten löschen
+
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
-    
-    // Gast-Modus aktivieren
+
     localStorage.setItem('guestMode', 'true');
-    
-    // Basis-Benutzerdaten für den Gast speichern
     const guestUser = {
-        name: "Guest User", 
+        name: "Guest User",
         email: "guest@example.com"
     };
     saveToLocalStorage('actualUser', guestUser);
-    
-    console.log("Guest mode activated");
-    
-    // Zur Summary-Seite weiterleiten - mit timeout um sicherzustellen, dass der Storage aktualisiert wurde
-    setTimeout(function() {
+    setTimeout(function () {
         console.log("Redirecting to summary page...");
         window.location.href = 'summary.html';
     }, 200);
-    
-    // Wichtig: false zurückgeben, um das Standardverhalten zu verhindern
     return false;
 }
 
@@ -228,14 +215,14 @@ async function loadRememberMe() {
     let rememberLocal = localStorage.getItem('rememberMe');
     if (rememberLocal) {
         remember = true;
-        
+
         let rememberedEmail = localStorage.getItem('rememberedEmail');
         let rememberedPassword = localStorage.getItem('rememberedPassword');
-        
+
         if (rememberedEmail && rememberedPassword) {
             document.getElementById("email").value = rememberedEmail;
             document.getElementById("password").value = rememberedPassword;
-            
+
             // Optional: Auto-login with remembered credentials
             if (remember) {
                 await login(rememberedEmail, rememberedPassword);
