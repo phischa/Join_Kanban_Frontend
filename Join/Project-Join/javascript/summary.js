@@ -85,16 +85,23 @@ function getGreeting(daytime) {
  * or returns an empty string if no user is logged in
  */
 function renderUserName(divID) {
-  let user;
   let username = localStorage.getItem('username');
-  field = document.getElementById(divID);
+  let field = document.getElementById(divID);
 
   if (username) {
-    user = username;
-    field.innerHTML = user;
+    let displayName = usernameIsGuest(username);
+    field.innerHTML = displayName;
   } else {
     field.innerHTML = "";
   }
+}
+
+function usernameIsGuest(username) {
+  let guest = "guest_";
+  if (username.includes(guest)) {
+    return "guest";
+  }
+  return username;
 }
 
 /**

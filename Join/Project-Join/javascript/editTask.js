@@ -22,7 +22,7 @@ function editActucalTask(columnId, id) {
 */
 async function loadBoardContacts() {
     let loadedBoardContacts = [];
-    loadedBoardContacts = await getItem('contacts');
+    loadedBoardContacts = loadAllContacts();
     if (loadedBoardContacts.data && loadedBoardContacts.data.value && loadedBoardContacts.data.value != "null") {
         boardContacts = JSON.parse(loadedBoardContacts.data.value);
     }

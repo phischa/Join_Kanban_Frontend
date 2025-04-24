@@ -27,8 +27,8 @@ interface that communicates seamlessly with the Django backend.
 ## Running the Application
 1. Simply open the index.html file in a web browser
    - For local development, you can use a simple HTTP server:
-     python -m http.server 5000
-   - Then navigate to http://localhost:5000
+     python -m http.server 5500
+   - Then navigate to http://localhost:5500
    - Or use the Live Server of your IDE
 
 2. Alternatively, deploy the files to any web server

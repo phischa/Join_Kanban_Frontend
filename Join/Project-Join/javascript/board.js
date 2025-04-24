@@ -50,6 +50,15 @@ async function saveCurrentTask(columnId = 0, id = 0, orWithID = false) {
     }
     actualizeSubtasks(columnId, id);
     editActucalTask(columnId, id);
+    try {
+        const taskToUpdate = list[columnId][id];
+        const response = await storeTask(taskToUpdate);
+        if (response.status === "error") {
+            console.error("Failed to save task:", response.message);
+        }
+    } catch (error) {
+        console.error("Error updating task:", error);
+    }
 }
 
 /**
@@ -57,7 +66,7 @@ async function saveCurrentTask(columnId = 0, id = 0, orWithID = false) {
 */
 function deleteCurrentTask(columnId, id) {
     let pulledTask = list[columnId][id]["taskID"];
-    deleteTask(pulledTask);
+    deleteTaskItem(pulledTask);
     deleteTaskFromtaskObjects(columnId, id);
     refreshColumnRender();
     hideBlackbox();

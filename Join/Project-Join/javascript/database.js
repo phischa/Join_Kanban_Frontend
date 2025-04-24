@@ -71,23 +71,6 @@ function createID() {
 }
 
 /**
- * This function logs in a guest user. 
- */
-function guestLogin() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    localStorage.setItem('guestMode', 'true');
-    
-    const guestUser = {
-        name: "Guest User", 
-        email: "guest@example.com"
-    };
-    saveToLocalStorage('actualUser', guestUser);
-    window.location.href = 'summary.html';
-}
-
-/**
  * Logs out the current user
  */
 function logout() {

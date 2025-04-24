@@ -171,27 +171,19 @@ function loginCheck(email) {
     }
 }
 
-/**
- * This function logs in a guest user. 
- */
-function guestLogin() {
-    event && event.preventDefault && event.preventDefault();
-
+// Lokaler Fallback wie vorher beschrieben
+function useLocalGuestMode() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
-
     localStorage.setItem('guestMode', 'true');
+    
     const guestUser = {
-        name: "Guest User",
+        name: "Guest User (Offline)", 
         email: "guest@example.com"
     };
     saveToLocalStorage('actualUser', guestUser);
-    setTimeout(function () {
-        console.log("Redirecting to summary page...");
-        window.location.href = 'summary.html';
-    }, 200);
-    return false;
+    window.location.href = 'summary.html';
 }
 
 /**

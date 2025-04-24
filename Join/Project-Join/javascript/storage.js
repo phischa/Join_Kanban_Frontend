@@ -28,6 +28,38 @@ function getAuthHeaders() {
     return headers;
 }
 
+async function guestLogin() {
+    try {
+        const response = await fetch(`${API_BASE_URL}user_auth/guest-login/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to create guest account');
+        }
+        
+        const data = await response.json();
+        
+        // Token im localStorage speichern
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('guestMode', 'true');
+        
+        const guestUser = {
+            name: data.username, 
+            email: data.email
+        };
+        saveToLocalStorage('actualUser', guestUser);
+        window.location.href = 'summary.html';
+    } catch (error) {
+        console.error("Error in guest login:", error);
+        // Fallback zur lokalen Speicherung
+        useLocalGuestMode();
+    }
+}
+
 /**
  * Test, if guest mode in active
  * @returns {boolean} Returns true if guest mode
@@ -44,7 +76,7 @@ function isGuestMode() {
  * @returns {Promise<Array|Object>} The JSON response data or an empty array if an error occurs
  */
 async function fetchFromApi(endpoint) {
-    if (isPublicPage() || isGuestMode()) { 
+    if (isPublicPage()) { 
         return [];
     }
     try {
@@ -88,10 +120,6 @@ function handleFetchError(response, endpoint) {
  * @returns {Promise<Object>} - Response data
  */
 async function createResource(endpoint, data) {
-    if (isGuestMode()) {
-        console.log(`Guest mode: Simulating create for ${endpoint}`);
-        simulateGuestTaskSave();
-    }
     try {
         console.log(`Creating resource at ${endpoint}:`, data);
         const response = await fetch(getApiUrl(endpoint), {
@@ -122,12 +150,6 @@ async function createResource(endpoint, data) {
  * @returns {Promise<Object>} - Response data
  */
 async function updateResource(endpoint, id, data) {
-    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
-    if (isGuestMode()) {
-        console.log(`Guest mode: Simulating update for ${endpoint}/${id}`);
-        return { status: "success" };
-    }
-
     try {
         console.log(`Updating ${endpoint}/${id}:`, data);
 
@@ -161,12 +183,7 @@ async function updateResource(endpoint, id, data) {
  * @returns {Promise<Object>} - Response status
  */
 async function deleteResource(endpoint, id) {
-    // Im Gast-Modus Erfolg simulieren statt API-Aufrufe
-    if (isGuestMode()) {
-        console.log(`Guest mode: Simulating delete for ${endpoint}/${id}`);
-        return { status: "success" };
-    }
-    try {
+try {
         const response = await fetch(`${getApiUrl(endpoint)}${id}/`, {
             method: 'DELETE',
             headers: getAuthHeaders()
@@ -345,68 +362,10 @@ async function registerUser(username, email, password, repeatedPassword) {
 }
 
 /**
- * Simulates saving a task in guest mode
- * @param {Object} task - Task to save
- * @returns {Object} - Response with simulated taskID
- */
-function simulateGuestTaskSave(task) {
-    const tempId = createID();
-    task.taskID = tempId;
-    
-    const localTasks = getFromLocalStorage('tasks') || [];
-    localTasks.push(task);
-    saveToLocalStorage('tasks', localTasks);
-    
-    return {
-        status: "success",
-        taskID: tempId,
-        message: "Task saved in guest mode"
-    };
-}
-
-/**
- * Simulates updating a task in guest mode
- * @param {Object} task - Task to update
- * @returns {Object} - Success response
- */
-function simulateGuestTaskUpdate(task) {
-    const localTasks = getFromLocalStorage('tasks') || [];
-    const index = localTasks.findIndex(t => t.taskID === task.taskID);
-    
-    if (index !== -1) {
-        localTasks[index] = task;
-        saveToLocalStorage('tasks', localTasks);
-        return { status: "success", message: "Task updated in guest mode" };
-    } else {
-        return simulateGuestTaskSave(task);
-    }
-}
-
-/**
- * Simulates deleting a task in guest mode
- * @param {string|number} taskId - Task ID to delete
- * @returns {Object} - Success response
- */
-function simulateGuestTaskDelete(taskId) {
-    const localTasks = getFromLocalStorage('tasks') || [];
-    const filteredTasks = localTasks.filter(t => t.taskID !== taskId);
-    
-    saveToLocalStorage('tasks', filteredTasks);
-    
-    return {
-        status: "success",
-        message: "Task deleted in guest mode"
-    };
-}
-
-/**
  * Updates the loadAllTasks function to handle guest mode
  * @returns {Promise<Array>} - Array of task objects
  */
 async function loadAllTasks() {
-    if (isGuestMode()) {
-        return getFromLocalStorage('tasks') || [];
-    }
     return await fetchFromApi('tasks');
 }
 
@@ -452,18 +411,6 @@ function checkResponseStatus(response) {
 }
 
 /**
- * Handles task storage in guest mode
- * @param {Object} task - Task to store
- * @returns {Object} - Storage response
- */
-function handleGuestModeTaskStorage(task) {
-    if (task.taskID) {
-        return simulateGuestTaskUpdate(task);
-    }
-    return simulateGuestTaskSave(task);
-}
-
-/**
  * Handles task storage via API
  * @param {Object} task - Task to store
  * @returns {Promise<Object>} - API response
@@ -478,16 +425,12 @@ async function handleApiTaskStorage(task) {
 }
 
 /**
- * Stores a task with guest mode support
+ * Stores a task
  * @param {Object} task - Task object to store
  * @returns {Promise<Object>} - Response
  */
 async function storeTask(task) {
     try {
-        if (isGuestMode()) {
-            return handleGuestModeTaskStorage(task);
-        }
-        
         const response = await handleApiTaskStorage(task);
         return checkResponseStatus(response);
     } catch (error) {
@@ -502,9 +445,6 @@ async function storeTask(task) {
  * @returns {Promise<Object>} - Response status
  */
 async function deleteTaskItem(taskId) {
-    if (isGuestMode()) {
-        return simulateGuestTaskDelete(taskId);
-    }
     return await deleteResource('tasks', taskId);
 }
 
@@ -551,54 +491,6 @@ async function deleteContactItem(contactId) {
         console.error("Error in deleteContactItem:", error);
         return { status: "error", message: error.message };
     }
-}
-
-/**
- * Updates create resource function for tasks
- */
-function updateCreateResourceFunction() {
-    const originalCreateResource = createResource;
-    createResource = async function(endpoint, data) {
-        if (isGuestMode() && endpoint === 'tasks') {
-            return simulateGuestTaskSave(data);
-        }
-        return originalCreateResource(endpoint, data);
-    };
-}
-
-/**
- * Updates update resource function for tasks
- */
-function updateUpdateResourceFunction() {
-    const originalUpdateResource = updateResource;
-    updateResource = async function(endpoint, id, data) {
-        if (isGuestMode() && endpoint === 'tasks') {
-            return simulateGuestTaskUpdate(data);
-        }
-        return originalUpdateResource(endpoint, id, data);
-    };
-}
-
-/**
- * Updates delete resource function for tasks
- */
-function updateDeleteResourceFunction() {
-    const originalDeleteResource = deleteResource;
-    deleteResource = async function(endpoint, id) {
-        if (isGuestMode() && endpoint === 'tasks') {
-            return simulateGuestTaskDelete(id);
-        }
-        return originalDeleteResource(endpoint, id);
-    };
-}
-
-/**
- * Updates resource functions to use task guest mode
- */
-function updateResourceFunctions() {
-    updateCreateResourceFunction();
-    updateUpdateResourceFunction();
-    updateDeleteResourceFunction();
 }
 
 /**
@@ -765,10 +657,7 @@ function logout() {
     }
 }
 
-// Ensure a default user exists in the system
 async function ensureDefaultUserExists() {
-    // This function is less needed with Django authentication
-    // But keeping it for backward compatibility
     try {
         const users = await loadAllUsers();
         if (!users || users.length === 0) {
@@ -780,8 +669,5 @@ async function ensureDefaultUserExists() {
         return [];
     }
 }
-
-// Initialize resource functions
-updateResourceFunctions();
 
 //------------------end of storage---------------------------------------------------------------------------
