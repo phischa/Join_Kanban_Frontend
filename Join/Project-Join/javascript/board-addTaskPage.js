@@ -93,9 +93,8 @@ async function saveBoardTaskAndUpdate(taskData) {
       taskData.title, taskData.description, taskData.assignedTo,
       taskData.dueDate, taskData.prio, taskData.category, taskData.subtasks
     );
-    
     const response = await storeTask(newTask);
-    
+    setTimeout(goToTaskBoard(), 500);
     if (response.status === "success") {
       cleanupBoardTaskForm();
       await setTaskToBoard();
@@ -106,6 +105,10 @@ async function saveBoardTaskAndUpdate(taskData) {
   } catch (error) {
     handleBoardTaskSaveError(error);
   }
+}
+
+function goToTaskBoard() {
+  window.location.href = "board.html";
 }
 
 /**

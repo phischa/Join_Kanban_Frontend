@@ -91,14 +91,12 @@ function deleteTaskFromtaskObjects(columnId, id) {
 async function baordLoadTasks() {
     taskObjects = [];
     try {
-        // Get tasks from API using our updated loadAllTasks function
         const loadedTasks = await loadAllTasks();
         if (Array.isArray(loadedTasks)) {
             taskObjects = [...loadedTasks];
         } else {
             console.error("Invalid response format from loadAllTasks");
         }
-        // Ensure each task has an assignedTo array
         taskObjects.forEach(task => {
             if (!task.assignedTo || !Array.isArray(task.assignedTo)) {
                 task.assignedTo = [];
