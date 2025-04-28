@@ -68,14 +68,11 @@ function updateContactsInLocalStorage(contactsArray) {
  * @returns {Object} - Contact object or null if not found
  */
 function getContactIDFromResponse(id) {
-    // Suche zuerst in den Kontakten der aktuellen Seite
     for (let i = 0; i < contactsOfAddPage.length; i++) {
         if (contactsOfAddPage[i].contactID == id) {
             return contactsOfAddPage[i];
         }
     }
-
-    // Alternativ in der Hauptkontaktliste suchen (falls vorhanden)
     if (typeof contacts !== 'undefined') {
         for (let i = 0; i < contacts.length; i++) {
             if (contacts[i].contactID == id) {
@@ -83,8 +80,6 @@ function getContactIDFromResponse(id) {
             }
         }
     }
-
-    // Wenn kein Kontakt gefunden wurde, gib ein Standardobjekt zurück
     return {
         name: "Unknown",
         initials: "??",
@@ -98,7 +93,6 @@ function getContactIDFromResponse(id) {
 function handleContactCreationError(contact, error) {
     console.error("Fehler beim Erstellen des Kontakts:", error);
 
-    // Füge trotzdem zum lokalen Array hinzu für bessere UX
     contact.contactID = createID(); // Temporäre lokale ID
     contacts.push(contact);
     saveToLocalStorage('contacts', contacts);
