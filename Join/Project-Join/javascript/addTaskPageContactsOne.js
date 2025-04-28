@@ -220,10 +220,12 @@ function sortAssignedContacts() {
  * goes wrong
  */
 function addContactsToPage() {
+  contactsOfAddPage = []; // Array leeren
+  
   for (let i = 0; i < contacts.length; i++) {
     const contact = {
       ...contacts[i],
-      contactID: contacts[i].contactID || contacts[i].id  
+      contactID: contacts[i]?.contactID || contacts[i].id  // Optional Chaining
     };
     contactsOfAddPage.push(contact);
   }
