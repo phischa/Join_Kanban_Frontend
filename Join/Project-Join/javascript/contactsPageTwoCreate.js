@@ -145,7 +145,6 @@ function openEditContact(i) {
     if (personCardCentric) {
         personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
         personCardCentric.classList.add('d-none');
-        console.log("Edit-Contact geöffnet: person-card-centric ausgeblendet");
     }
 }
 
@@ -200,8 +199,9 @@ function closeWindow() {
     document.getElementById('mobile-edit-delete-c').classList.add('d-none');
     document.body.style.overflowY = 'auto'; // Hier ändern zu 'auto' statt 'hidden'
     
-    // Nach dem Schließen des Fensters Sichtbarkeit prüfen
-    console.log("Kontaktformular geschlossen, prüfe Sichtbarkeit von person-card-centric");
+    setTimeout(() => {
+        window.location.href = "./contactsPage.html";
+    }, 1300);
     setTimeout(handleScreenSizeChange, 100);
 }
 

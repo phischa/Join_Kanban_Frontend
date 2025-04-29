@@ -113,7 +113,6 @@ function deletedContactList() {
 */
 let showContactList = window.matchMedia('(min-width: 1201px)');
 showContactList.addEventListener("change", function(e) {
-    console.log("MediaQuery Change erkannt:", e.matches ? "Desktop" : "Mobile");
     showAgainContactList(e);
 });
 
@@ -122,7 +121,6 @@ showContactList.addEventListener("change", function(e) {
  */
 function showAgainContactList(e) {
     if (e.matches) {
-        console.log("Desktop-Ansicht aktiviert durch MediaQuery");
         document.getElementById('width-contact-container').classList.remove('d-none');
         document.getElementById('mobile-edit-delete-c').classList.add('d-none');
         document.getElementById('person-card-mobile').classList.add('d-none');
@@ -137,7 +135,6 @@ function showAgainContactList(e) {
         if (personCardCentric) {
             personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
             personCardCentric.classList.remove('d-none');
-            console.log("Desktop-Ansicht durch MediaQuery: person-card-centric eingeblendet");
         }
     }
 }
@@ -157,11 +154,9 @@ function backToContactList() {
         if (!isMobileView()) {
             personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
             personCardCentric.classList.remove('d-none');
-            console.log("Zurück zur Kontaktliste (Desktop): person-card-centric eingeblendet");
         } else {
             personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
             personCardCentric.classList.add('d-none');
-            console.log("Zurück zur Kontaktliste (Mobile): person-card-centric ausgeblendet");
         }
     }
 }

@@ -35,10 +35,6 @@ function checkUserBeforeContactOperation() {
     if (!isAuthenticated() && !isGuestMode()) {
         console.warn("User not authenticated for contact operation");
         
-        // Option 1: Redirect to login page
-        // redirectToLogin();
-        
-        // Option 2: Activate local mode
         activateGuestModeWithWarning();
         
         return false;
@@ -103,11 +99,11 @@ async function loadAuthenticatedContacts() {
 /**
  * Loads contacts from local storage (for guest mode or fallback)
  */
-function loadContactsFromLocalStorage() {
+/* function loadContactsFromLocalStorage() {
     const localContacts = getFromLocalStorage('contacts') || [];
     console.log("Loaded contacts from local storage:", localContacts.length);
     return localContacts;
-}
+} */
 
 /**
  * Loads contacts in guest mode

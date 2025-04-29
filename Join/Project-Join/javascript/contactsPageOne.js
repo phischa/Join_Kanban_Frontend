@@ -15,8 +15,6 @@ function logViewportStatus() {
     const personCardCentric = document.querySelector('.person-card-centric');
     const isMobile = isMobileView();
     const isHidden = personCardCentric ? personCardCentric.classList.contains('d-none') : 'Element nicht gefunden';
-    
-    console.log(`Viewport: ${window.innerWidth}px, Mobile: ${isMobile}, person-card-centric versteckt: ${isHidden}`);
 }
 
 /** 
@@ -219,7 +217,6 @@ function ifScreenMobileDisplayNone() {
     if (personCardCentric) {
         personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
         personCardCentric.classList.add('d-none');
-        console.log("Mobile Ansicht aktiviert: person-card-centric ausgeblendet");
     }
 }
 
@@ -230,7 +227,6 @@ function ifScreenMobileDisplayNone() {
 function handleScreenSizeChange() {
     const personCardCentric = document.querySelector('.person-card-centric');
     if (!personCardCentric) {
-        console.warn("Element .person-card-centric nicht gefunden!");
         return;
     }
     
@@ -238,12 +234,10 @@ function handleScreenSizeChange() {
         // Mobile Ansicht: Element ausblenden
         personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
         personCardCentric.classList.add('d-none');
-        console.log("Kleine Bildschirmbreite erkannt: person-card-centric ausgeblendet");
     } else {
         // Desktop-Ansicht: Element einblenden
         personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
         personCardCentric.classList.remove('d-none');
-        console.log("Große Bildschirmbreite erkannt: person-card-centric eingeblendet");
     }
 }
 
@@ -282,12 +276,10 @@ function changeColorBackOfThePreviewContactContainer(i){
 
 // Event-Listener für Resize-Events hinzufügen
 window.addEventListener('resize', function() {
-    console.log("Resize-Event erkannt, Bildschirmbreite:", window.innerWidth);
     handleScreenSizeChange();
 });
 
 // Initial bei DOM-Laden
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM geladen, initialer Check der Bildschirmbreite");
     handleScreenSizeChange();
 });

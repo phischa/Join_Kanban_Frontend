@@ -293,7 +293,6 @@ function handleSuccessfulContactCreation() {
     
     // Nach erfolgreicher Kontakterstellung prüfen, ob person-card-centric angezeigt werden soll
     setTimeout(function() {
-        console.log("Kontakt erstellt, prüfe Sichtbarkeit von person-card-centric");
         handleScreenSizeChange();
-    }, 2500); // Verzögerung damit Animation abgeschlossen ist
+    }, 2500);
 }
