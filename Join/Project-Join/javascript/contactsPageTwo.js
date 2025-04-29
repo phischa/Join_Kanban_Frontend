@@ -67,7 +67,7 @@ function checkValidationByTrueBorderInvisible(statusValidationName,statusValidat
  * Checks the validation and styles the gap between input field in the mobile and desktop version
  */
 function checkedNameAndStyleTheGap(){
-    if(screen.width < 1000){
+    if(window.innerWidth < 1000){
         styleTheGapBetweenInputFieldMobile('name');
     } else {
         styleTheGapBetweenInputFieldDesktop('name');
@@ -78,7 +78,7 @@ function checkedNameAndStyleTheGap(){
  * Checks the validation and styles the gap between input field in the mobile and desktop version
  */
 function checkedEmailAndStyleTheGap(){
-    if(screen.width < 1000){
+    if(window.innerWidth < 1000){
         styleTheGapBetweenInputFieldMobile('email');
     } else {
         styleTheGapBetweenInputFieldDesktop('email'); 
@@ -89,7 +89,7 @@ function checkedEmailAndStyleTheGap(){
  * Checks the validation and styles the gap between input field in the mobile and desktop version
  */
 function checkedPhoneAndStyleTheGap(){
-    if(screen.width < 1000){
+    if(window.innerWidth < 1000){
         styleTheGapBetweenInputFieldMobile('phone');
     } else {
         styleTheGapBetweenInputFieldDesktop('phone');
@@ -186,6 +186,14 @@ function openAddContact() {
     document.getElementById('add-contact-bg').classList.remove('d-none');
     addListenerForAddContact();
     myStatus = false;
+    
+    // Bei Öffnen des Add-Contact-Fensters person-card-centric ausblenden
+    const personCardCentric = document.querySelector('.person-card-centric');
+    if (personCardCentric) {
+        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.classList.add('d-none');
+        console.log("Add-Contact geöffnet: person-card-centric ausgeblendet");
+    }
 }
 
 /**
@@ -200,17 +208,17 @@ function styleAddContact(){
     document.getElementById('color-icon').style.backgroundColor = '';
     document.getElementById('container-editcontact').classList.add('d-none');
     document.getElementById('container-addcontact').classList.remove('d-none');
-    if(screen.width < 1000){
+    if(window.innerWidth < 1000){
         document.getElementById('requiredtext').style.marginTop = "12px";
         document.getElementById('requiredemail').style.marginTop = "12px";
-        }
+    }
 }
 
 /**
  * Makes the distance of the input field in the desktop version
  */
 function distanceInputField(){
-    if(screen.width > 1200){
+    if(window.innerWidth > 1200){
         document.getElementById('required-name').style.margin = "0.5rem 0 0 0.5rem";
         document.getElementById('required-name').style.height = "1.932rem";
         document.getElementById('required-email').style.margin = "0.5rem 0 0 0.5rem";
@@ -282,4 +290,10 @@ function handleSuccessfulContactCreation() {
     renderContactList();
     document.getElementById('text-successfulcreated').innerHTML = 'Contact successfully created';
     closeAddContactWithAnimation();
+    
+    // Nach erfolgreicher Kontakterstellung prüfen, ob person-card-centric angezeigt werden soll
+    setTimeout(function() {
+        console.log("Kontakt erstellt, prüfe Sichtbarkeit von person-card-centric");
+        handleScreenSizeChange();
+    }, 2500); // Verzögerung damit Animation abgeschlossen ist
 }

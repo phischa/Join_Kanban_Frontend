@@ -10,6 +10,9 @@ function successfulSent() {
 */
 function closeSuccessfulSent() {
     document.getElementById('success-created').classList.add('d-none');
+    
+    // Nach dem Schließen des Erfolgsfensters Sichtbarkeit prüfen
+    setTimeout(handleScreenSizeChange, 100);
 }
 
 /** 
@@ -89,9 +92,12 @@ function handleSuccessfulDeletion() {
     closeAddContact();
     document.getElementById('person-card').classList.add('d-none');
 
-    if (screen.width < 1200) {
+    if (isMobileView()) {
         backToContactList();
     }
+    
+    // Nach dem Löschen Sichtbarkeit prüfen
+    setTimeout(handleScreenSizeChange, 300);
 }
 
 /** 
@@ -106,10 +112,17 @@ function deletedContactList() {
 *   Insert or fade out of the mobile-version
 */
 let showContactList = window.matchMedia('(min-width: 1201px)');
-showContactList.addEventListener("resize", showAgainContactList);
+showContactList.addEventListener("change", function(e) {
+    console.log("MediaQuery Change erkannt:", e.matches ? "Desktop" : "Mobile");
+    showAgainContactList(e);
+});
 
+/**
+ * Wird aufgerufen wenn die Bildschirmbreite >= 1201px ist (Desktop-Ansicht)
+ */
 function showAgainContactList(e) {
     if (e.matches) {
+        console.log("Desktop-Ansicht aktiviert durch MediaQuery");
         document.getElementById('width-contact-container').classList.remove('d-none');
         document.getElementById('mobile-edit-delete-c').classList.add('d-none');
         document.getElementById('person-card-mobile').classList.add('d-none');
@@ -118,6 +131,14 @@ function showAgainContactList(e) {
         document.getElementById('mobile-addcontact').classList.remove('d-none');
         document.getElementById('button-createcontact').style.marginTop = '0';
         document.getElementById('add-contact').style.height = '37rem';
+        
+        // person-card-centric im Desktop-Modus immer einblenden
+        const personCardCentric = document.querySelector('.person-card-centric');
+        if (personCardCentric) {
+            personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
+            personCardCentric.classList.remove('d-none');
+            console.log("Desktop-Ansicht durch MediaQuery: person-card-centric eingeblendet");
+        }
     }
 }
 
@@ -129,6 +150,20 @@ function backToContactList() {
     document.getElementById('mobile-option').classList.add('d-none');
     document.getElementById('mobile-addcontact').classList.remove('d-none');
     document.getElementById('person-card-mobile').classList.add('d-none');
+    
+    // person-card-centric Sichtbarkeit basierend auf Bildschirmgröße steuern
+    const personCardCentric = document.querySelector('.person-card-centric');
+    if (personCardCentric) {
+        if (!isMobileView()) {
+            personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
+            personCardCentric.classList.remove('d-none');
+            console.log("Zurück zur Kontaktliste (Desktop): person-card-centric eingeblendet");
+        } else {
+            personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+            personCardCentric.classList.add('d-none');
+            console.log("Zurück zur Kontaktliste (Mobile): person-card-centric ausgeblendet");
+        }
+    }
 }
 
 /** 
@@ -189,7 +224,7 @@ function removeListenerForEditContact() {
     let allInputFields = [document.getElementById('ltitlename'), document.getElementById('ltitleemail'), document.getElementById('ltitlephone')];
 
     allInputFields.forEach(listenerInputfield => {
-        listenerInputfield.addEventListener("keyup", checkEditContactValidityNameEmailPhone);
+        listenerInputfield.removeEventListener("keyup", checkEditContactValidityNameEmailPhone);
     });
     eventButton.removeEventListener("mouseover", validityFalseAboveButtonRedBorderEditContact);
     eventButton.removeEventListener("mouseout", validityFalseLeaveButtonWhiteBorderEditContact);

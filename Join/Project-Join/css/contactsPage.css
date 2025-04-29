@@ -74,11 +74,19 @@ h6{
     overflow-y: auto; 
 } 
 
-.line{
+/* .line{
     height: 3.688rem;
     width: 0.188rem;
     margin: 0 1.875rem; 
     background-color: #29ABE2;
+} */
+
+.line-horizontal {
+    height: 0.125rem;
+    width: 5rem;
+    border: 1px solid #29ABE2;
+    background-color: #29ABE2;
+    margin-top: 16px;
 }
 
 .text-headline{

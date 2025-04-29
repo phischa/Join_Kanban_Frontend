@@ -1,5 +1,24 @@
 let sortedContactsByName, resetBgColor = 0, lastIndex, editIndex;
 
+/**
+ * Konsistente Methode zur Prüfung, ob aktuell die Mobile-Ansicht aktiv ist
+ * @returns {boolean} True wenn mobile Ansicht (≤1200px), sonst False
+ */
+function isMobileView() {
+    return window.innerWidth <= 1200;
+}
+
+/** 
+ * Logs die aktuelle Bildschirmbreite und Sichtbarkeit des zentralen Elements
+ */
+function logViewportStatus() {
+    const personCardCentric = document.querySelector('.person-card-centric');
+    const isMobile = isMobileView();
+    const isHidden = personCardCentric ? personCardCentric.classList.contains('d-none') : 'Element nicht gefunden';
+    
+    console.log(`Viewport: ${window.innerWidth}px, Mobile: ${isMobile}, person-card-centric versteckt: ${isHidden}`);
+}
+
 /** 
  *  Loads functions that are needed upfront.
  */
@@ -11,7 +30,13 @@ async function onload() {
             await loadContacts();
         }
         renderContactList();
+        
+        // Überprüfe initial die Bildschirmgröße und setze die Sichtbarkeit
+        handleScreenSizeChange();
+        // Debug-Log
+        logViewportStatus();
     } catch (error) {
+        console.error("Fehler beim Laden der Kontakte:", error);
         await loadContacts();
         renderContactList();
     }
@@ -49,10 +74,16 @@ function renderContactList() {
         sortedContactsByName = sortContactsByName(contacts);
         let allExistedFirstLetter = allUniqueFirstLetter();
 
+        let content = document.getElementById('contact-list');
+        content.innerHTML = ''; // Liste leeren bevor wir sie neu aufbauen
+
         for (let i = 0; i < allExistedFirstLetter.length; i++) {
             loadFirstLetterContainer(allExistedFirstLetter[i]);
             loadContactsContactPage(allExistedFirstLetter[i]);
         }
+        
+        // Nach dem Rendern der Liste Sichtbarkeit prüfen
+        handleScreenSizeChange();
     }
 }
 
@@ -135,14 +166,16 @@ function renderContactContainer(i) {
 function openContact(i) {
     editIndex = i;
 
-    if (screen.width > 1200) {
+    if (!isMobileView()) {
         openPersonCard(i);
-    }
-    if (screen.width < 1200) {
+    } else {
         ifScreenMobileDisplayNone();
         showPersonCard(i);
         lastIndex = i;
     }
+    
+    // Debug-Log
+    logViewportStatus();
 }
 
 /**
@@ -153,7 +186,7 @@ function openPersonCard(i){
         document.getElementById('person-card').classList.remove('d-none');
         renderPreviewContact(i);
         let phoneNumber = spaceInPhoneNumber(sortedContactsByName[i]["phone"]);
-        if (screen.width >= 1201) {
+        if (!isMobileView()) {
             animationPersonCard();
         }
         renderContact(i, phoneNumber);
@@ -172,6 +205,7 @@ function showPersonCard(i) {
 
 /** 
  * Switch display on / off from the ID.
+ * Diese Funktion wird aufgerufen, wenn auf mobile Ansicht umgeschaltet wird
  */
 function ifScreenMobileDisplayNone() {
     document.getElementById('width-contact-container').classList.add('d-none');
@@ -179,6 +213,38 @@ function ifScreenMobileDisplayNone() {
     document.getElementById('person-card-mobile').classList.remove('d-none');
     document.getElementById('mobile-addcontact').classList.add('d-none');
     document.getElementById('mobile-option').classList.remove('d-none');
+    
+    // In der mobilen Ansicht person-card-centric immer ausblenden
+    const personCardCentric = document.querySelector('.person-card-centric');
+    if (personCardCentric) {
+        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.classList.add('d-none');
+        console.log("Mobile Ansicht aktiviert: person-card-centric ausgeblendet");
+    }
+}
+
+/**
+ * Zentrale Funktion zur Steuerung der Sichtbarkeit von .person-card-centric
+ * basierend auf der Bildschirmbreite
+ */
+function handleScreenSizeChange() {
+    const personCardCentric = document.querySelector('.person-card-centric');
+    if (!personCardCentric) {
+        console.warn("Element .person-card-centric nicht gefunden!");
+        return;
+    }
+    
+    if (isMobileView()) {
+        // Mobile Ansicht: Element ausblenden
+        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.classList.add('d-none');
+        console.log("Kleine Bildschirmbreite erkannt: person-card-centric ausgeblendet");
+    } else {
+        // Desktop-Ansicht: Element einblenden
+        personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
+        personCardCentric.classList.remove('d-none');
+        console.log("Große Bildschirmbreite erkannt: person-card-centric eingeblendet");
+    }
 }
 
 /** 
@@ -213,3 +279,15 @@ function changeColorBackOfThePreviewContactContainer(i){
     document.getElementById(`first-last-name${i}`).style.color = '#FFFFFF';
     document.getElementById(`border-circle${i}`).style.border = '2px solid #FFFFFF';
 }
+
+// Event-Listener für Resize-Events hinzufügen
+window.addEventListener('resize', function() {
+    console.log("Resize-Event erkannt, Bildschirmbreite:", window.innerWidth);
+    handleScreenSizeChange();
+});
+
+// Initial bei DOM-Laden
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM geladen, initialer Check der Bildschirmbreite");
+    handleScreenSizeChange();
+});

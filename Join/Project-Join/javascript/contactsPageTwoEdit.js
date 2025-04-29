@@ -32,6 +32,13 @@ function saveSelectedContact(name, email, phone, i){
     deletedContactList();
     renderContactList();
     closeAddContactWithAnimation();
+    
+    // Nach dem Bearbeiten des Kontakts prüfen, ob person-card-centric angezeigt werden soll
+    setTimeout(function() {
+        console.log("Kontakt bearbeitet, prüfe Sichtbarkeit von person-card-centric");
+        handleScreenSizeChange();
+        logViewportStatus(); // Debug-Log
+    }, 2800); // Längere Verzögerung für sicheres Timing
 }
 
 /**
@@ -77,7 +84,6 @@ async function saveContactToBackend(contactData) {
  */
 function handleContactSaveResponse(response) {
     if (response.status !== "success") {
-        console.error("Contact could not be updated in the backend:", response);
         localStorage.setItem('contacts', JSON.stringify(contacts));
     } else {
         console.log("Contact successfully updated");

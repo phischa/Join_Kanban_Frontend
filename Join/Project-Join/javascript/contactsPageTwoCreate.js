@@ -139,6 +139,14 @@ function openEditContact(i) {
     addListenerForEditContact();
     myStatusEditContact = false;
     statusOverwriting = false;
+    
+    // Bei Öffnen des Edit-Contact-Fensters person-card-centric ausblenden
+    const personCardCentric = document.querySelector('.person-card-centric');
+    if (personCardCentric) {
+        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.classList.add('d-none');
+        console.log("Edit-Contact geöffnet: person-card-centric ausgeblendet");
+    }
 }
 
 /**
@@ -151,7 +159,7 @@ function styleEditContact() {
     document.getElementById('container-addcontact').classList.add('d-none');
     document.getElementById('container-editcontact').classList.remove('d-none');
     document.getElementById('button-save').style.backgroundColor = '#2A3647';
-    if (screen.width < 1000) {
+    if (window.innerWidth < 1000) {
         document.getElementById('requiredtext').style.marginTop = "0";
         document.getElementById('requiredemail').style.marginTop = "0";
     }
@@ -184,12 +192,17 @@ function closeAddContact() {
 
 /** 
  * Closes the window
+ * Diese Funktion wird nach dem Schließen des Kontaktformulars aufgerufen
 */
 function closeWindow() {
     document.getElementById('add-contact-bg').classList.add('d-none');
     document.getElementById('mobile-contact-view').classList.add('d-none');
     document.getElementById('mobile-edit-delete-c').classList.add('d-none');
-    document.body.style.overflowY = 'hidden';
+    document.body.style.overflowY = 'auto'; // Hier ändern zu 'auto' statt 'hidden'
+    
+    // Nach dem Schließen des Fensters Sichtbarkeit prüfen
+    console.log("Kontaktformular geschlossen, prüfe Sichtbarkeit von person-card-centric");
+    setTimeout(handleScreenSizeChange, 100);
 }
 
 /** 

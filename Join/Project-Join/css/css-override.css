@@ -1,0 +1,72 @@
+/*
+ * CSS-Überschreibungen für die korrekte Anzeige der person-card-centric
+ * Diese Datei als css-override.css speichern und nach den anderen CSS-Dateien einbinden
+ */
+
+/* 
+ * WICHTIG: Diese Regeln müssen nach den anderen CSS-Dateien geladen werden,
+ * damit die !important-Deklarationen Vorrang haben
+ */
+
+/* Desktop-Ansicht: person-card-centric immer einblenden */
+@media screen and (min-width: 1201px) {
+    .person-card-centric {
+        display: block !important; /* !important überschreibt alle anderen Regeln */
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Sicherstellen, dass die Kindelelemente auch angezeigt werden */
+    .person-card-centric .headline-container,
+    .person-card-centric .person-card {
+        display: block !important;
+    }
+}
+
+/* Mobile-Ansicht: person-card-centric immer ausblenden */
+@media screen and (max-width: 1200px) {
+    .person-card-centric {
+        display: none !important; /* !important überschreibt alle anderen Regeln */
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+}
+
+/* Zusätzliche Regeln, um sicherzustellen, dass andere Elemente korrekt angezeigt werden */
+@media screen and (min-width: 1201px) {
+    /* Mobile-Elemente in Desktop-Ansicht ausblenden */
+    .headline-container-mobile,
+    .person-card-mobile,
+    .mobile-name,
+    .close-white-icon,
+    #mobile-contact-view {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    /* Desktop-Elemente in Mobile-Ansicht ausblenden */
+    .headline-container:not(.headline-container-mobile),
+    .person-card:not(.person-card-mobile) {
+        display: none !important;
+    }
+    
+    /* Mobile-Elemente in Mobile-Ansicht einblenden (wenn aktiv) */
+    #mobile-contact-view:not(.d-none) {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Kontaktliste auf volle Breite setzen */
+    .contact-container {
+        width: 100% !important;
+    }
+}
+
+/* 
+ * Sicherstellen, dass d-none immer funktioniert, unabhängig von anderen Regeln 
+ * Dies ist wichtig für die JavaScript-Steuerung
+ */
+.d-none {
+    display: none !important;
+}
