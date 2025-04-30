@@ -77,7 +77,12 @@ function logout() {
     localStorage.setItem('rememberMe', '');
     localStorage.removeItem('rememberedEmail');
     localStorage.removeItem('rememberedPassword');
-    localStorage.removeItem('guestMode'); // Wichtig: Auch den Gast-Modus entfernen
+    localStorage.removeItem('guestMode');
+    localStorage.removeItem('contacts');
+    localStorage.removeItem('tasks');
+    contacts = [];
+    tasks = [];
+    
     deleteActualUser();
     window.location.href = "./start.html";
 }

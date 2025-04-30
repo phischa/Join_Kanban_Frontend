@@ -187,12 +187,10 @@ function openAddContact() {
     addListenerForAddContact();
     myStatus = false;
     
-    // Bei Öffnen des Add-Contact-Fensters person-card-centric ausblenden
     const personCardCentric = document.querySelector('.person-card-centric');
     if (personCardCentric) {
-        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.style.display = 'none';
         personCardCentric.classList.add('d-none');
-        console.log("Add-Contact geöffnet: person-card-centric ausgeblendet");
     }
 }
 
@@ -290,10 +288,7 @@ function handleSuccessfulContactCreation() {
     renderContactList();
     document.getElementById('text-successfulcreated').innerHTML = 'Contact successfully created';
     closeAddContactWithAnimation();
-    
-    // Nach erfolgreicher Kontakterstellung prüfen, ob person-card-centric angezeigt werden soll
     setTimeout(function() {
-        console.log("Kontakt erstellt, prüfe Sichtbarkeit von person-card-centric");
         handleScreenSizeChange();
-    }, 2500); // Verzögerung damit Animation abgeschlossen ist
+    }, 2500);
 }

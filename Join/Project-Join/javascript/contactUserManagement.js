@@ -36,10 +36,10 @@ function checkUserBeforeContactOperation() {
         console.warn("User not authenticated for contact operation");
         
         // Option 1: Redirect to login page
-        // redirectToLogin();
+        redirectToLogin();
         
         // Option 2: Activate local mode
-        activateGuestModeWithWarning();
+        //activateGuestModeWithWarning();
         
         return false;
     }
@@ -147,11 +147,7 @@ async function saveUserContact(contact) {
     }
     
     try {
-        if (isGuestMode()) {
-            return simulateGuestContactSave(contact);
-        } else {
-            return await saveAuthenticatedContact(contact);
-        }
+        return await saveAuthenticatedContact(contact);
     } catch (error) {
         console.error("Error saving contact:", error);
         return { status: "error", message: error.message };
@@ -195,11 +191,7 @@ async function deleteUserContact(contactID) {
     }
     
     try {
-        if (isGuestMode()) {
-            return deleteGuestContact(contactID);
-        } else {
-            return await deleteAuthenticatedContact(contactID);
-        }
+        return await deleteAuthenticatedContact(contactID);
     } catch (error) {
         console.error("Error deleting contact:", error);
         return { status: "error", message: error.message };

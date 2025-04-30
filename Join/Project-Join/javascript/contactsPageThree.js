@@ -113,31 +113,36 @@ function deletedContactList() {
 */
 let showContactList = window.matchMedia('(min-width: 1201px)');
 showContactList.addEventListener("change", function(e) {
-    console.log("MediaQuery Change erkannt:", e.matches ? "Desktop" : "Mobile");
     showAgainContactList(e);
 });
 
 /**
- * Wird aufgerufen wenn die Bildschirmbreite >= 1201px ist (Desktop-Ansicht)
+ * Called when the screen width is >= 1201px (desktop view)
  */
 function showAgainContactList(e) {
     if (e.matches) {
-        console.log("Desktop-Ansicht aktiviert durch MediaQuery");
-        document.getElementById('width-contact-container').classList.remove('d-none');
-        document.getElementById('mobile-edit-delete-c').classList.add('d-none');
-        document.getElementById('person-card-mobile').classList.add('d-none');
-        document.getElementById('mobile-name').classList.add('d-none');
-        document.getElementById('mobile-option').classList.add('d-none');
-        document.getElementById('mobile-addcontact').classList.remove('d-none');
-        document.getElementById('button-createcontact').style.marginTop = '0';
-        document.getElementById('add-contact').style.height = '37rem';
+        const widthContactContainer = document.getElementById('width-contact-container');
+        const mobileEditDeleteC = document.getElementById('mobile-edit-delete-c');
+        const personCardMobile = document.getElementById('person-card-mobile');
+        const mobileName = document.getElementById('mobile-name');
+        const mobileOption = document.getElementById('mobile-option');
+        const mobileAddContact = document.getElementById('mobile-addcontact');
+        const buttonCreateContact = document.getElementById('button-createcontact');
+        const addContact = document.getElementById('add-contact');
+
+        if (widthContactContainer) widthContactContainer.classList.remove('d-none');
+        if (mobileEditDeleteC) mobileEditDeleteC.classList.add('d-none');
+        if (personCardMobile) personCardMobile.classList.add('d-none');
+        if (mobileName) mobileName.classList.add('d-none');
+        if (mobileOption) mobileOption.classList.add('d-none');
+        if (mobileAddContact) mobileAddContact.classList.remove('d-none');
+        if (buttonCreateContact) buttonCreateContact.style.marginTop = '0';
+        if (addContact) addContact.style.height = '37rem';
         
-        // person-card-centric im Desktop-Modus immer einblenden
         const personCardCentric = document.querySelector('.person-card-centric');
         if (personCardCentric) {
             personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
             personCardCentric.classList.remove('d-none');
-            console.log("Desktop-Ansicht durch MediaQuery: person-card-centric eingeblendet");
         }
     }
 }
@@ -147,9 +152,22 @@ function showAgainContactList(e) {
 */
 function backToContactList() {
     document.getElementById('width-contact-container').classList.remove('d-none');
-    document.getElementById('mobile-option').classList.add('d-none');
-    document.getElementById('mobile-addcontact').classList.remove('d-none');
+    document.getElementById('mobile-contact-view').classList.add('d-none');
     document.getElementById('person-card-mobile').classList.add('d-none');
+    
+    // Explicitly hide the options button with all possible methods
+    const mobileOptionButton = document.getElementById('mobile-option');
+    mobileOptionButton.classList.add('d-none');
+    mobileOptionButton.style.visibility = 'hidden';
+    mobileOptionButton.style.display = 'none';
+    mobileOptionButton.style.opacity = '0';
+    
+    // Explicitly show the add contact button with all possible methods
+    const mobileAddButton = document.getElementById('mobile-addcontact');
+    mobileAddButton.classList.remove('d-none');
+    mobileAddButton.style.visibility = 'visible';
+    mobileAddButton.style.display = 'flex';
+    mobileAddButton.style.opacity = '1';
     
     // person-card-centric Sichtbarkeit basierend auf Bildschirmgröße steuern
     const personCardCentric = document.querySelector('.person-card-centric');
@@ -157,11 +175,9 @@ function backToContactList() {
         if (!isMobileView()) {
             personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
             personCardCentric.classList.remove('d-none');
-            console.log("Zurück zur Kontaktliste (Desktop): person-card-centric eingeblendet");
         } else {
             personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
             personCardCentric.classList.add('d-none');
-            console.log("Zurück zur Kontaktliste (Mobile): person-card-centric ausgeblendet");
         }
     }
 }

@@ -32,13 +32,10 @@ function saveSelectedContact(name, email, phone, i){
     deletedContactList();
     renderContactList();
     closeAddContactWithAnimation();
-    
-    // Nach dem Bearbeiten des Kontakts prüfen, ob person-card-centric angezeigt werden soll
     setTimeout(function() {
-        console.log("Kontakt bearbeitet, prüfe Sichtbarkeit von person-card-centric");
         handleScreenSizeChange();
         logViewportStatus(); // Debug-Log
-    }, 2800); // Längere Verzögerung für sicheres Timing
+    }, 2800);
 }
 
 /**

@@ -1,20 +1,49 @@
+/** 
+ * Creates a new contact and ensures the backend ID is captured
+ */
+async function createContactOnContactPage() {
+    const name = document.getElementById('ltitlename').value;
+    const email = document.getElementById('ltitleemail').value;
+    const phone = document.getElementById('ltitlephone').value;
+
+    try {
+        const createdContact = await createContact(name, email, phone);
+        const existingIndex = contacts.findIndex(c => 
+            c.email === email && c.name === name
+        );
+        if (existingIndex >= 0) {
+            contacts[existingIndex].contactID = createdContact.contactID;
+        } else {
+            contacts.push(createdContact);
+        }
+        handleSuccessfulContactCreation();
+    } catch (error) {
+        console.error("Failed to create contact:", error);
+        alert("Failed to create contact. Please try again.");
+    }
+}
+
 /**
  * Creates a new contact
  * @param {string} name - Contact name
  * @param {string} email - Contact email
  * @param {string} phone - Contact phone number
- * @returns {Object} - Created contact object
+ * @returns {Promise<Object>} - Created contact object with backend ID
  */
 async function createContact(name, email, phone) {
     const color = generateRandomColor();
     const newContact = createContactObject(name, email, phone, color);
 
     try {
-        // The current user is automatically assigned in the backend
         const response = await storeContact(newContact);
-        return await processContactResponse(response, newContact);
+        if (response.status === "error") {
+            throw new Error(response.message || "Failed to create contact");
+        }
+        const finalContact = await processContactResponse(response, newContact);
+        return finalContact;
     } catch (error) {
-        return handleContactCreationError(newContact, error);
+        console.error("Error in createContact:", error);
+        throw error;
     }
 }
 
@@ -35,30 +64,48 @@ function createContactObject(name, email, phone, color) {
 /**
  * Processes the response after creating a contact
  * Ensures the contact is associated with the current user
+ * @param {Object} response - Response from the backend
+ * @param {Object} contact - Original contact object
+ * @returns {Object} - Updated contact with backend ID
  */
 async function processContactResponse(response, contact) {
-    const contactID = getContactIDFromResponse(response);
+    const newID = extractContactIDFromResponse(response);
 
-    if (contactID) {
-        // Update contact with ID and add to array
-        contact.contactID = contactID;
-
-        // Only add contact to local array if it's intended for the current user
-        contacts.push(contact);
-
-        // Local storage for offline access/guest mode
+    if (newID) {
+        contact.contactID = newID;
+        if (!contacts.find(c => c.contactID === newID)) {
+            contacts.push(contact);
+        }
         updateContactsInLocalStorage(contacts);
         return contact;
     } else {
-        throw new Error("Contact could not be saved");
+        console.error("Failed to extract contact ID from response:", response);
+        throw new Error("Contact could not be saved: missing ID in response");
     }
+}
+
+/**
+ * Extracts contact ID from backend response
+ * @param {Object} response - Backend response
+ * @returns {string|number|null} - Contact ID or null if not found
+ */
+function extractContactIDFromResponse(response) {
+    if (response && response.contactID) {
+        return response.contactID;
+    }
+    if (response && response.id) {
+        return response.id;
+    }
+    if (response && response.data && (response.data.contactID || response.data.id)) {
+        return response.data.contactID || response.data.id;
+    }
+    return null;
 }
 
 /**
  * Updates contacts in local storage
  */
 function updateContactsInLocalStorage(contactsArray) {
-    // Ensure only contacts of the current user are saved
     saveToLocalStorage('contacts', contactsArray);
 }
 
@@ -93,11 +140,11 @@ function getContactIDFromResponse(id) {
 function handleContactCreationError(contact, error) {
     console.error("Fehler beim Erstellen des Kontakts:", error);
 
-    contact.contactID = createID(); // Temporäre lokale ID
+    /* contact.contactID = createID(); // Temporäre lokale ID
     contacts.push(contact);
     saveToLocalStorage('contacts', contacts);
 
-    return contact;
+    return contact; */
 }
 
 /**
@@ -145,7 +192,6 @@ function openEditContact(i) {
     if (personCardCentric) {
         personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
         personCardCentric.classList.add('d-none');
-        console.log("Edit-Contact geöffnet: person-card-centric ausgeblendet");
     }
 }
 
@@ -199,9 +245,6 @@ function closeWindow() {
     document.getElementById('mobile-contact-view').classList.add('d-none');
     document.getElementById('mobile-edit-delete-c').classList.add('d-none');
     document.body.style.overflowY = 'auto'; // Hier ändern zu 'auto' statt 'hidden'
-    
-    // Nach dem Schließen des Fensters Sichtbarkeit prüfen
-    console.log("Kontaktformular geschlossen, prüfe Sichtbarkeit von person-card-centric");
     setTimeout(handleScreenSizeChange, 100);
 }
 
