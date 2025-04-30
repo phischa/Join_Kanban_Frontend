@@ -1,26 +1,27 @@
 let sortedContactsByName, resetBgColor = 0, lastIndex, editIndex;
 
 /**
- * Konsistente Methode zur Prüfung, ob aktuell die Mobile-Ansicht aktiv ist
- * @returns {boolean} True wenn mobile Ansicht (≤1200px), sonst False
+ * Consistent method to check if the mobile view is currently active
+ * @returns {boolean} True if mobile view (≤1200px), otherwise False
  */
 function isMobileView() {
     return window.innerWidth <= 1200;
 }
 
 /** 
- * Logs die aktuelle Bildschirmbreite und Sichtbarkeit des zentralen Elements
+ * Logs the current screen width and visibility of the central element
  */
 function logViewportStatus() {
     const personCardCentric = document.querySelector('.person-card-centric');
     const isMobile = isMobileView();
-    const isHidden = personCardCentric ? personCardCentric.classList.contains('d-none') : 'Element nicht gefunden';
+    const isHidden = personCardCentric ? personCardCentric.classList.contains('d-none') : 'Element not found';
 }
 
 /** 
  *  Loads functions that are needed upfront.
  */
 async function onload() {
+    forceMobileButtonVisibility() 
     try {
         if (typeof loadUserContactsOnInit === 'function') {
             await loadUserContactsOnInit();
@@ -28,15 +29,15 @@ async function onload() {
             await loadContacts();
         }
         renderContactList();
-        
-        // Überprüfe initial die Bildschirmgröße und setze die Sichtbarkeit
         handleScreenSizeChange();
-        // Debug-Log
         logViewportStatus();
+        forceMobileButtonVisibility();
+        
     } catch (error) {
-        console.error("Fehler beim Laden der Kontakte:", error);
+        console.error("Error loading contacts:", error);
         await loadContacts();
         renderContactList();
+        forceMobileButtonVisibility();
     }
 }
 
@@ -73,15 +74,14 @@ function renderContactList() {
         let allExistedFirstLetter = allUniqueFirstLetter();
 
         let content = document.getElementById('contact-list');
-        content.innerHTML = ''; // Liste leeren bevor wir sie neu aufbauen
+        content.innerHTML = ''; // Clear list before rebuilding
 
         for (let i = 0; i < allExistedFirstLetter.length; i++) {
             loadFirstLetterContainer(allExistedFirstLetter[i]);
             loadContactsContactPage(allExistedFirstLetter[i]);
         }
-        
-        // Nach dem Rendern der Liste Sichtbarkeit prüfen
         handleScreenSizeChange();
+        forceMobileButtonVisibility();
     }
 }
 
@@ -171,8 +171,6 @@ function openContact(i) {
         showPersonCard(i);
         lastIndex = i;
     }
-    
-    // Debug-Log
     logViewportStatus();
 }
 
@@ -203,41 +201,65 @@ function showPersonCard(i) {
 
 /** 
  * Switch display on / off from the ID.
- * Diese Funktion wird aufgerufen, wenn auf mobile Ansicht umgeschaltet wird
+ * This function is called when switching to mobile view
  */
 function ifScreenMobileDisplayNone() {
     document.getElementById('width-contact-container').classList.add('d-none');
     document.getElementById('mobile-contact-view').classList.remove('d-none');
     document.getElementById('person-card-mobile').classList.remove('d-none');
-    document.getElementById('mobile-addcontact').classList.add('d-none');
-    document.getElementById('mobile-option').classList.remove('d-none');
     
-    // In der mobilen Ansicht person-card-centric immer ausblenden
+    // Explicitly hide the add contact button with all possible methods
+    const mobileAddButton = document.getElementById('mobile-addcontact');
+    mobileAddButton.classList.add('d-none');
+    mobileAddButton.style.visibility = 'hidden';
+    mobileAddButton.style.display = 'none';
+    mobileAddButton.style.opacity = '0';
+    
+    // Explicitly show the options button with all possible methods
+    const mobileOptionButton = document.getElementById('mobile-option');
+    mobileOptionButton.classList.remove('d-none');
+    mobileOptionButton.style.visibility = 'visible';
+    mobileOptionButton.style.display = 'flex';
+    mobileOptionButton.style.opacity = '1';
+    
+    // In mobile view, always hide person-card-centric
     const personCardCentric = document.querySelector('.person-card-centric');
     if (personCardCentric) {
-        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.style.display = 'none'; // Direct style manipulation
         personCardCentric.classList.add('d-none');
     }
 }
 
 /**
- * Zentrale Funktion zur Steuerung der Sichtbarkeit von .person-card-centric
- * basierend auf der Bildschirmbreite
+ * Central function for controlling visibility of .person-card-centric
+ * and mobile buttons based on screen width
  */
 function handleScreenSizeChange() {
     const personCardCentric = document.querySelector('.person-card-centric');
+    const mobileAddButton = document.getElementById('mobile-addcontact');
+    const mobileOptionButton = document.getElementById('mobile-option');
+    
     if (!personCardCentric) {
         return;
-    }
-    
+    } 
     if (isMobileView()) {
-        // Mobile Ansicht: Element ausblenden
-        personCardCentric.style.display = 'none'; // Direkte Style-Manipulation
+        personCardCentric.style.display = 'none';
         personCardCentric.classList.add('d-none');
+        if (mobileAddButton) {
+            mobileAddButton.style.visibility = 'visible';
+        }
+        if (mobileOptionButton) {
+            mobileOptionButton.style.visibility = 'visible';
+        }
     } else {
-        // Desktop-Ansicht: Element einblenden
-        personCardCentric.style.display = 'block'; // Direkte Style-Manipulation
+        personCardCentric.style.display = 'block';
         personCardCentric.classList.remove('d-none');
+        if (mobileAddButton) {
+            mobileAddButton.style.visibility = 'hidden';
+        }
+        if (mobileOptionButton) {
+            mobileOptionButton.style.visibility = 'hidden';
+        }
     }
 }
 
@@ -246,7 +268,6 @@ function handleScreenSizeChange() {
  */
 function renderPreviewContact(i) {
     let tablinks;
-
     changeColorOfThePreviewContactContainer();
     tablinks = document.getElementsByClassName("preview-contact-container");
     for (j = 0; j < tablinks.length; j++) {
@@ -274,12 +295,33 @@ function changeColorBackOfThePreviewContactContainer(i){
     document.getElementById(`border-circle${i}`).style.border = '2px solid #FFFFFF';
 }
 
-// Event-Listener für Resize-Events hinzufügen
+/**
+ * Ensure mobile button visibility can be called manually if needed
+ */
+function forceMobileButtonVisibility() {
+    const mobileAddButton = document.getElementById('mobile-addcontact');
+    if (mobileAddButton && isMobileView()) {
+        mobileAddButton.classList.remove('d-none');
+        mobileAddButton.style.visibility = 'visible';
+        mobileAddButton.style.display = 'flex';
+        mobileAddButton.style.opacity = '1';
+    }
+}
+
+// Event-Listener for resize events
 window.addEventListener('resize', function() {
     handleScreenSizeChange();
+    forceMobileButtonVisibility();
 });
 
-// Initial bei DOM-Laden
+// Initial at DOM loading
 document.addEventListener('DOMContentLoaded', function() {
     handleScreenSizeChange();
+    setTimeout(function() {
+        handleScreenSizeChange();
+        if (isMobileView()) {
+            forceMobileButtonVisibility();
+        }
+        logViewportStatus();
+    }, 300);
 });

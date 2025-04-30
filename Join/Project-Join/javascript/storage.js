@@ -121,7 +121,6 @@ function handleFetchError(response, endpoint) {
  */
 async function createResource(endpoint, data) {
     try {
-        console.log(`Creating resource at ${endpoint}:`, data);
         const response = await fetch(getApiUrl(endpoint), {
             method: 'POST',
             headers: getAuthHeaders(),
@@ -151,8 +150,6 @@ async function createResource(endpoint, data) {
  */
 async function updateResource(endpoint, id, data) {
     try {
-        console.log(`Updating ${endpoint}/${id}:`, data);
-
         const response = await fetch(`${getApiUrl(endpoint)}${id}/`, {
             method: 'PUT',
             headers: getAuthHeaders(),
@@ -239,7 +236,6 @@ async function authenticateUser(email, password) {
     try {
         const response = await loginApiCall(email, password);
         const data = await response.json();
-        console.log("Login response:", data);
         
         return processLoginResponse(data);
     } catch (error) {
@@ -392,7 +388,6 @@ function createTask(title, description, assigned, date, prio, category, subtasks
         currentProgress: 0
     };
     tasks.push(task);
-    console.log("Task created:", task);
     return task;
 }
 
@@ -461,19 +456,59 @@ async function loadAllContacts() {
  * Creates or updates a contact
  * The user is automatically derived from the auth token
  * @param {Object} contact - Contact object
- * @returns {Promise<Object>} - Response data
+ * @returns {Promise<Object>} - Response data with the contact ID
  */
 async function storeContact(contact) {
     try {
-        // Choose storage operation depending on whether an ID exists
-        if (contact.contactID) {
-            return await updateResource('contacts', contact.contactID, contact);
+        let contactID = contact.contactID;
+        if (typeof contactID === 'object' && contactID !== null) {
+            contactID = contactID.id || contactID.contactID;
+        }
+        const isLocalId = typeof contactID === 'string' && contactID.length === 16;
+        if (!contactID || isLocalId) {
+            const { contactID, ...contactWithoutId } = contact;
+            return await executeContactOperation('create', contactWithoutId);
         } else {
-            return await createResource('contacts', contact);
+            const contactToUpdate = { ...contact, contactID };
+            return await executeContactOperation('update', contactToUpdate, contactID);
         }
     } catch (error) {
         console.error("Error in storeContact:", error);
         return { status: "error", message: error.message };
+    }
+}
+
+/**
+ * Executes the actual API operation for contacts
+ * @param {string} operation - 'create' or 'update'
+ * @param {Object} contactData - The contact data to send
+ * @param {string|number} id - Contact ID (only needed for update)
+ * @returns {Promise<Object>} - Response from the API
+ */
+async function executeContactOperation(operation, contactData, id = null) {
+    try {
+        let response;
+        
+        if (operation === 'create') {
+            response = await createResource('contacts', contactData);
+            // Update the local contact object with the new ID from backend
+            if (response && (response.contactID || response.id)) {
+                const newID = response.contactID || response.id;
+                return {
+                    ...response,
+                    contactID: newID
+                };
+            }
+        } else if (operation === 'update') {
+            response = await updateResource('contacts', id, contactData);
+        } else {
+            throw new Error(`Unknown operation: ${operation}`);
+        }
+        
+        return response;
+    } catch (error) {
+        console.error(`Error in executeContactOperation (${operation}):`, error);
+        throw error; // Rethrow to let the caller handle it
     }
 }
 
@@ -640,14 +675,17 @@ function isAuthenticated() {
  * Logs out the current user
  */
 function logout() {
-    // Wenn wir auf einer öffentlichen Seite sind, nicht umleiten
     const isPublic = isPublicPage();
-    console.log("Logout called on public page:", isPublic);
-    
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
     removeFromLocalStorage('actualUser');
+    localStorage.removeItem('contacts');
+    localStorage.removeItem('tasks');
+
+    if (typeof contacts !== 'undefined') contacts = [];
+    if (typeof tasks !== 'undefined') tasks = [];
+    
     if (!localStorage.getItem('rememberMe')) {
         localStorage.removeItem('rememberedEmail');
         localStorage.removeItem('rememberedPassword');
@@ -661,7 +699,7 @@ async function ensureDefaultUserExists() {
     try {
         const users = await loadAllUsers();
         if (!users || users.length === 0) {
-            console.log("No users found in the system.");
+            console.warn("No users found in the system.");   
         }
         return users;
     } catch (error) {

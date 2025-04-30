@@ -63,10 +63,32 @@
     }
 }
 
-/* 
- * Sicherstellen, dass d-none immer funktioniert, unabhängig von anderen Regeln 
- * Dies ist wichtig für die JavaScript-Steuerung
- */
-.d-none {
+/* Ensure that when contact view is active, the add button is hidden */
+#mobile-contact-view:not(.d-none) ~ #mobile-addcontact,
+.mobile-contact-view:not(.d-none) #mobile-addcontact {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
+
+/* Ensure that when contact view is active, the options button is visible */
+#mobile-contact-view:not(.d-none) ~ #mobile-option,
+.mobile-contact-view:not(.d-none) #mobile-option {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure that when returning to contact list, the buttons switch visibility */
+#mobile-contact-view.d-none ~ #mobile-addcontact {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#mobile-contact-view.d-none ~ #mobile-option {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+

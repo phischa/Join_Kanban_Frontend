@@ -4,45 +4,75 @@ let phantomTaskObject = {};
 let editSubtask = [];
 
 /**
-* set Subtasks from a task to the Workspave in Database.
-*/
+ * Sets subtasks from a task to the workspace in database
+ * @param {number} columnId - Column ID of the task
+ * @param {number} id - ID of the task
+ */
 function actualizeSubtasks(columnId, id) {
     subtasksOfActualTask = list[columnId][id]["subtasks"];
 }
 
 /**
-* overwrite old Subtasks with current Edit.
-*/
+ * Overwrites old subtasks with current edit
+ * @param {number} columnId - Column ID of the task
+ * @param {number} id - ID of the task
+ */
 function editActucalTask(columnId, id) {
     actualTask = list[columnId][id];
 }
 
 /**
-* loadings all Contacts from Storage
-*/
+ * Loads all contacts from storage
+ * @returns {Promise<void>}
+ */
 async function loadBoardContacts() {
-    let loadedBoardContacts = [];
-    loadedBoardContacts = loadAllContacts();
-    if (loadedBoardContacts.data && loadedBoardContacts.data.value && loadedBoardContacts.data.value != "null") {
-        boardContacts = JSON.parse(loadedBoardContacts.data.value);
+    try {
+        if (contacts.length === 0) {
+            const loadedContacts = await loadAllContacts();
+            
+            if (Array.isArray(loadedContacts)) {
+                boardContacts = loadedContacts.map(contact => ({
+                    ...contact,
+                    contactID: contact.contactID || contact.id
+                }));
+            } 
+            else {
+                console.error("Fehler beim Laden der Kontakte: Kein Array zurückgegeben");
+                boardContacts = [];
+            }
+        } 
+        else {
+            boardContacts = contacts.map(contact => ({
+                ...contact,
+                contactID: contact.contactID || contact.id
+            }));
+        }
+        
+        console.log(`${boardContacts.length} Kontakte für das Board geladen`);
+    } 
+    catch (error) {
+        console.error("Fehler beim Laden der Kontakte:", error);
+        boardContacts = [];
     }
 }
 
 /**
-* save chages to the storage
-*/
+ * Saves changes to the task
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ * @returns {Promise<void>}
+ */
 async function saveChagesToTask(columnNumber, id) {
     list[columnNumber][id] = phantomTaskObject;
     await saveCurrentTask(columnNumber, id, false);
 }
 
 /**
-* renders a new Subtask to Edit.
-* if input is empty a error appears.
-* @param {string} newTask - text of the new task.
-* @param {element} elementId - original Parenelement to add a error if needed.
-* @param {number} idOfInput - id from input.
-*/
+ * Renders a new subtask to edit
+ * @param {string} newTask - Text of the new task
+ * @param {HTMLElement} elementId - Original parent element
+ * @param {number} idOfInput - ID of input
+ */
 function saveNewSubtask(newTask, elementId, idOfInput) {
     delerror();
     let parentElement = document.getElementById(`selectAddInput_1`);
@@ -55,8 +85,11 @@ function saveNewSubtask(newTask, elementId, idOfInput) {
 }
 
 /**
-* init after open the edit-mode.
-*/
+ * Initializes after opening the edit mode
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ * @returns {Promise<void>}
+ */
 async function openEditableMode(columnNumber, id) {
     let content = document.getElementById(`cardLightboxContent`)
     content.innerHTML = templateLightboxEditTask(columnNumber, id)
@@ -72,8 +105,10 @@ async function openEditableMode(columnNumber, id) {
 }
 
 /**
-* rebuild from a object to prevent deep referencing in Objects. 
-*/
+ * Rebuilds from an object to prevent deep referencing in objects
+ * @param {Array} currentObject - Object to iterate through
+ * @returns {Array} - New array with cloned objects
+ */
 function iteratetThoughObject(currentObject) {
     let newArray = [];
     let emptyObject = {}
@@ -86,11 +121,11 @@ function iteratetThoughObject(currentObject) {
 }
 
 /**
-* will set up a new PseudoTask.
-* PseudoTask is needed to store all edits until it will be saved.
-* After all Edits gets saved the original Task gets overwritten by this PseudoObject.
-* @param {number} modus - switch beteween generating assignedTo and subtasks.
-*/
+ * Sets up a new PseudoTask to store edits until saved
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ * @param {number} modus - Mode (0: assignedTo, 1: subtasks)
+ */
 function generatePseudoObject(columnNumber, id, modus = 0) {
     let customObject = {};
     let currentObject = {};
@@ -107,8 +142,9 @@ function generatePseudoObject(columnNumber, id, modus = 0) {
 }
 
 /**
-* After clicking on a Priority it will switch the value of setNewPriority
-*/
+ * Returns the newest priority after clicking on a priority button
+ * @returns {string|null} - Priority value
+ */
 function setNewestPriority() {
     let options = ["urgent", "medium", "low"];
     let currentOption = null;
@@ -119,8 +155,10 @@ function setNewestPriority() {
 }
 
 /**
-* looks for the current priority before edit appears - to set the current prio-button right
-*/
+ * Checks current priority before edit appears to set priority button correctly
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ */
 function checkCurrentPrio(columnNumber, id) {
     let currentValue = list[columnNumber][id]["priority"];
     let newValue = null;
@@ -135,9 +173,9 @@ function checkCurrentPrio(columnNumber, id) {
 }
 
 /**
-* for change appearance of prio-button after click on it.
-* @param {number} value - current prio value. (1 = medium, 2 = low, 0 = urgent )
-*/
+ * Changes appearance of priority button after clicking
+ * @param {number} value - Current priority value (1=medium, 2=low, 0=urgent)
+ */
 function setOfValuePrio(value) {
     let allElements = document.querySelectorAll("[priorityButton]");
     for (let i = 0; i < allElements.length; i++) {
@@ -155,8 +193,11 @@ function setOfValuePrio(value) {
 }
 
 /**
-* before edit gets closed it will checked for required inputs are empty and save all changes.
-*/
+ * Checks for required inputs and saves changes
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ * @returns {Promise<void>}
+ */
 async function checkAndSave(columnNumber, id) {
     delerror();
     let isRequired = checkRequiredInputs();
@@ -174,8 +215,10 @@ async function checkAndSave(columnNumber, id) {
 }
 
 /**
-* collects all needed data to generate phantomTaskObject. -A Clone Object of the current Task
-*/
+ * Collects data to generate phantomTaskObject (clone of current task)
+ * @param {number} columnNumber - Column number
+ * @param {number} id - Task ID
+ */
 function setChagesToPhantomTask(columnNumber, id) {
     phantomTaskObject["taskID"] = list[columnNumber][id]["taskID"];
     phantomTaskObject["title"] = document.getElementById("lightboxEditTitle").value;
@@ -187,11 +230,11 @@ function setChagesToPhantomTask(columnNumber, id) {
 }
 
 /**
-* reveived a list with elements, which it will check for empty inputs / missing infos.
-* Otherwise is will generate a Error with the received ErrorText
-* @param {Array} ArrayWithElements - received from checkRequiredInputs() - A list with Elements, who needs to get checked.
-* @param {string} ErrorText - just a Text for the error.
-*/
+ * Checks elements for empty inputs and generates errors if needed
+ * @param {Array} ArrayWithElements - List of elements to check
+ * @param {string} ErrorText - Error text to display
+ * @returns {boolean} - True if all inputs valid
+ */
 function checkForError(ArrayWithElements, ErrorText) {
     let ischeked = true
     let errorCounter = 0
@@ -210,9 +253,10 @@ function checkForError(ArrayWithElements, ErrorText) {
 }
 
 /**
-* checks for open edits in Subtask and checks for empty Inputs.
-* @param {Array} allEditSuptaskInputs - received from checkRequiredInputs() - A list with Elements, who needs to get checked.
-*/
+ * Checks for open edits in subtasks and validates inputs
+ * @param {NodeList} allEditSuptaskInputs - All subtask input elements
+ * @returns {boolean} - True if all inputs valid
+ */
 function checkSuptaskForError(allEditSuptaskInputs) {
     let ischeked = true;
     let idFromInput = "";
@@ -227,8 +271,9 @@ function checkSuptaskForError(allEditSuptaskInputs) {
 }
 
 /**
-* @returns true/false if requirements are fulfilled.
-*/
+ * Checks if all required inputs are filled
+ * @returns {boolean} - True if all requirements are met
+ */
 function checkRequiredInputs() {
     let title = document.getElementById("lightboxEditTitle");
     let date = document.getElementById("ldatename");
@@ -243,21 +288,29 @@ function checkRequiredInputs() {
 }
 
 /**
-* rendering each profil into 'Assign To' inside select box
-*/
+ * Renders contact profiles in the AssignTo selection box
+ */
 function renderProfilsInAssignToEdit() {
     let content = document.getElementById("selectArea_1");
-    let contactId = "";
+    if (!content) {
+        console.error("selectArea_1 Element nicht gefunden");
+        return;
+    }
     content.innerHTML = "";
+    if (!boardContacts || boardContacts.length === 0) {
+        content.innerHTML = `<div class="no-contacts">Keine Kontakte verfügbar</div>`;
+        return;
+    }
+    
     for (let i = 0; i < boardContacts.length; i++) {
-        contactId = boardContacts[i]["contactID"];
+        const contactId = boardContacts[i].contactID;
         content.innerHTML += templateProfilForAssignTo(i, contactId);
     }
 }
 
 /**
-* rendering each Subtask
-*/
+ * Renders all subtasks in the edit view
+ */
 function rendersubtask() {
     let content = document.getElementById("cardLightboxEditSubtask");
     content.innerHTML = "";
@@ -271,9 +324,10 @@ function rendersubtask() {
 }
 
 /**
-* save a Subtask after editing
-* @param id - current id from Subtask in Edit-Windows
-*/
+ * Saves a new subtask after editing
+ * @param {number} id - ID of the subtask
+ * @returns {boolean} - True if saved successfully
+ */
 function addNewSubTask(id) {
     let isSaved = true;
     let inputElement = document.getElementById(`selectAddInputField_${id}`);
@@ -294,16 +348,17 @@ function addNewSubTask(id) {
 }
 
 /**
-* delete a Subtask
-*/
+ * Deletes a subtask
+ * @param {number} id - ID of the subtask to delete
+ */
 function deleteSubtask(id) {
     phantomTaskObject["subtasks"].splice(id, 1);
     rendersubtask();
 }
 
 /**
-* function to sreach in AssignTo
-*/
+ * Searches for contacts in the AssignTo dropdown
+ */
 function searchInAssignTo() {
     let toSearch = document.getElementById("selectInput_1").value;
     let content = document.getElementById("selectArea_1");
@@ -321,18 +376,18 @@ function searchInAssignTo() {
 }
 
 /**
-* refresh the content in Subtask
-* @param {number} id - current id of the Subtask
-*/
+ * Makes a subtask editable
+ * @param {number} id - ID of the subtask
+ */
 function makeEditSubtask(id) {
     let content = document.getElementById(`subtask_${id}`);
     content.innerHTML = refreshtemplateSubtaskInEdit(id);
 }
 
 /**
-* checks inputs and save the new value of a Subtask#
-* @param {number} id - current id of the Subtask
-*/
+ * Saves changes to a subtask
+ * @param {number} id - ID of the subtask
+ */
 function saveChagesSubtask(id) {
     delerror();
     let newValue = document.getElementById(`subtask_${id}_input`).value
@@ -347,9 +402,9 @@ function saveChagesSubtask(id) {
 }
 
 /**
-* switch back to normal view and don't save any changes
-* @param {number} id - current id of the Subtask
-*/
+ * Cancels changes to a subtask
+ * @param {number} id - ID of the subtask
+ */
 function undoChagesSubtask(id) {
     delerror();
     let subtask = phantomTaskObject["subtasks"][id]["subTaskName"]
@@ -358,36 +413,64 @@ function undoChagesSubtask(id) {
 }
 
 /**
-* set the current status of someone to assign him to a task.
-* @param {string} contactId - Id from Contact
-* @param {number} id - current id of loadet User
-*/
+ * Toggles assignment status of a contact to a task
+ * @param {string} contactId - ID of the contact
+ * @param {number} id - Index of the contact in boardContacts
+ */
 function changeStatusAssignTo(contactId, id) {
     let isFound = false;
-    let array = phantomTaskObject["assignedTo"];
-    for (let i = 0; i < phantomTaskObject["assignedTo"].length; i++) {
-        if (array[i]["contactID"] == contactId) {
+    let array = phantomTaskObject.assignedTo || [];
+    
+    for (let i = 0; i < array.length; i++) {
+        let currentContactId = array[i].contactID;
+        
+        if (typeof currentContactId === 'object' && currentContactId !== null) {
+            currentContactId = currentContactId.id || currentContactId.contactID;
+        }
+        
+        if (currentContactId == contactId) {
             isFound = true;
             array.splice(i, 1);
+            break;
         }
     }
-    if (isFound == false) {
-        array.push(boardContacts[id]);
+    
+    if (!isFound && id >= 0 && id < boardContacts.length) {
+        array.push({
+            contactID: boardContacts[id].contactID,
+            name: boardContacts[id].name,
+            email: boardContacts[id].email,
+            color: boardContacts[id].color,
+            initials: boardContacts[id].initials
+        });
     }
+    
+    phantomTaskObject.assignedTo = array;
     renderProfilsInAssignToEdit();
 }
 
 /**
-* set the rightz image if somebody is already involved to a task. 
-* @param {string} contactId - just the id from current User.
-*/
+ * Checks if a contact is already assigned to a task
+ * @param {string} contactId - ID of the contact to check
+ * @returns {string} - Path to the appropriate checkmark icon
+ */
 function checkIsAssignedto(contactId) {
     let imgpath = "../img/icons/check-button-mobile-uncheck.svg";
-    for (let i = 0; i < phantomTaskObject["assignedTo"].length; i++) {
-        Searchkey = phantomTaskObject["assignedTo"][i]["contactID"];
-        if (contactId == phantomTaskObject["assignedTo"][i]["contactID"]) {
-            imgpath = "../img/icons/check-button-mobile-check.svg";
+    
+    if (phantomTaskObject && phantomTaskObject.assignedTo) {
+        for (let i = 0; i < phantomTaskObject.assignedTo.length; i++) {
+            let assignedContactId = phantomTaskObject.assignedTo[i].contactID;
+            
+            if (typeof assignedContactId === 'object' && assignedContactId !== null) {
+                assignedContactId = assignedContactId.id || assignedContactId.contactID;
+            }
+            
+            if (contactId == assignedContactId) {
+                imgpath = "../img/icons/check-button-mobile-check.svg";
+                break;
+            }
         }
     }
+    
     return imgpath;
 }
