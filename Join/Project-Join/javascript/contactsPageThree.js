@@ -90,15 +90,21 @@ function handleSuccessfulDeletion() {
     renderContactList();
     closeDeleteContact();
     closeAddContact();
-    document.getElementById('person-card').classList.add('d-none');
+    reloadContactSite();
 
     if (isMobileView()) {
         backToContactList();
     }
     
-    // Nach dem Löschen Sichtbarkeit prüfen
     setTimeout(handleScreenSizeChange, 300);
 }
+
+/**
+ * Reloads ContactsPage
+ */
+    function reloadContactSite() {
+        window.location.href = 'contactsPage.html';
+    }
 
 /** 
 *  This function deletes contact list.
