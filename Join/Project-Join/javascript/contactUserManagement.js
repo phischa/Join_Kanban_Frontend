@@ -110,7 +110,6 @@ function loadGuestContacts() {
  * Handles errors when loading contacts
  */
 function handleContactLoadError(error) {
-    console.error("Failed to load contacts:", error);
     showContactLoadErrorNotification();
 }
 
