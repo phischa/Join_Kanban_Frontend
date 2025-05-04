@@ -14,7 +14,6 @@
  */
 function checkContactAuthentication() {
     if (!isAuthenticated() && !isGuestMode()) {
-        console.log("User not authenticated, redirecting to login");
         redirectToLogin();
         return false;
     }
@@ -99,15 +98,6 @@ async function loadAuthenticatedContacts() {
         return loadContactsFromLocalStorage();
     }
 }
-
-/**
- * Loads contacts from local storage (for guest mode or fallback)
- */
-/* function loadContactsFromLocalStorage() {
-    const localContacts = getFromLocalStorage('contacts') || [];
-    console.log("Loaded contacts from local storage:", localContacts.length);
-    return localContacts;
-} */
 
 /**
  * Loads contacts in guest mode
@@ -245,7 +235,6 @@ async function initializeContacts() {
  */
 async function setupContactsEnvironment() {
     if (isPublicPage()) {
-        console.log("Public page, no contact initialization needed");
         return;
     }
     

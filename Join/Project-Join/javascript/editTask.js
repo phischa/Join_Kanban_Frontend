@@ -47,8 +47,6 @@ async function loadBoardContacts() {
                 contactID: contact.contactID || contact.id
             }));
         }
-        
-        console.log(`${boardContacts.length} Kontakte für das Board geladen`);
     } 
     catch (error) {
         console.error("Fehler beim Laden der Kontakte:", error);

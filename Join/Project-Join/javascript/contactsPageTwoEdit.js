@@ -82,8 +82,6 @@ async function saveContactToBackend(contactData) {
 function handleContactSaveResponse(response) {
     if (response.status !== "success") {
         localStorage.setItem('contacts', JSON.stringify(contacts));
-    } else {
-        console.log("Contact successfully updated");
     }
 }
 

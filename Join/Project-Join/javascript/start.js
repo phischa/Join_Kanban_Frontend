@@ -23,10 +23,8 @@ function setupFormListener() {
  */
 function setupFormSubmitPrevention() {
     const form = document.getElementById('form');
-
     if (form) {
         form.onsubmit = function (e) {
-            console.log("Form submit prevented");
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -48,7 +46,6 @@ function setupLoginButtonHandler() {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            console.log("Login button clicked");
             handleManualLogin();
         });
     }
@@ -96,7 +93,6 @@ function handleRememberMe(email, password) {
  * Legacy function for compatibility
  */
 async function onsubmitLogin() {
-    console.log("onsubmitLogin called - forwarding to handleManualLogin");
     await handleManualLogin();
     return false;
 }
@@ -106,9 +102,7 @@ async function onsubmitLogin() {
  */
 async function login(email, password) {
     try {
-        console.log("Attempting login with:", email);
         const result = await authenticateUser(email, password);
-
         handleLoginResult(result);
     } catch (error) {
         console.error('Login error:', error);
@@ -121,8 +115,6 @@ async function login(email, password) {
  * Handles login result
  */
 function handleLoginResult(result) {
-    console.log("Login result:", result);
-
     if (result.status === "success") {
         storeActualUser(result.user);
         window.location.href = 'summary.html';
@@ -135,8 +127,6 @@ function handleLoginResult(result) {
  * Handles login errors
  */
 function handleLoginError(errorMessage) {
-    console.log("Login error:", errorMessage);
-
     const errorMsg = errorMessage.toLowerCase();
     if (isEmailRelatedError(errorMsg)) {
         colorRedMail();

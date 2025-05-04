@@ -97,8 +97,6 @@ async function sendRegistrationToBackend(email, username, password, repeated_pas
  * @param {Object} data - Response from the server
  */
 function handleRegistrationResponse(data) {
-  console.log('Processing registration response:', data);
-  
   if (data.status === 'success') {
     handleSuccessfulRegistration(data);
   } else {
